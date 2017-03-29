@@ -2,6 +2,10 @@ tbUseProject('Spitschan201x_MaxMel');
 
 % Define the paths
 dropboxBasePath = '/Users/spitschan/Dropbox (Aguirre-Brainard Lab)';
+outDir = fullfile(pwd, 'tables');
+if ~isdir(outDir)
+    mkdir(outDir);
+end
 
 theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxLMS400pct/HERO_asb1/040716/StimulusFiles/Cache-LMSDirectedSuperMaxLMS/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
     'MELA_data/MelanopsinMR_fMRI/MaxLMS400pct/HERO_aso1/033016/StimulusFiles/Cache-LMSDirectedSuperMaxLMS/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
@@ -24,7 +28,7 @@ theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxLMS400pct/HERO_asb1/040716/Stimu
     'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_asb1/051016/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
     'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_aso1/042916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
     'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_gka1/050616/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_mxs1/050916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'}
+    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_mxs1/050916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
 
 theStimuli = {'LMS 400%' 'LMS 400%'  'LMS 400%'  'LMS 400%'  ...
     'LMS CRF'  'LMS CRF'  'LMS CRF'  'LMS CRF' 'LMS CRF'...
@@ -42,9 +46,8 @@ theContrastLevels = {[400] [400] [400] [400] ...
     [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] ...
     [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
 
-fid = fopen('~/Desktop/test.csv', 'w');
-fprintf(fid, 'Stimulus,Observer,Nominal contrast,Luminance,SD,Chromaticity x,SD,Chromaticity y,SD,L contrast [%s],SD,M contrast [%s],SD,S contrast [%s],SD,LMS contrast [%s],SD,L-M contrast [%s],SD\n', '%', '%', '%', '%', '%');
-
+fid = fopen(fullfile(outDir, 'TableX_Splatter.csv'), 'w');
+fprintf(fid, 'Stimulus,Observer,Nominal contrast [%s],Luminance [cd/m2],SD,Irradiance [sc td],[log10 sc td],SD,Irradiance [ph td],[log10 ph td],SD,x chromaticity,SD,y chromaticity,SD,L contrast [%s],SD,M contrast [%s],SD,S contrast [%s],SD,LMS contrast [%s],SD,L-M contrast [%s],SD\n', '%', '%', '%', '%', '%', '%');
 
 currDir = pwd;
 Mc = [];
@@ -59,6 +62,8 @@ for d = 1:length(theDataPaths)
     clear postRecepContrasts;
     clear luminance;
     clear chromaticity;
+    clear irradianceScotTrolands;
+    clear irradiancePhotTrolands;
     
     for k = length(theFolders):-1:1
         % remove non-folders
@@ -76,8 +81,6 @@ for d = 1:length(theDataPaths)
     
     % Iterate over the folders
     for f = 1:length(theFolders)
-        fprintf('>> Validation %s\n', theFolders(f).name);
-        
         % Go to the folder
         if isdir(fullfile(dropboxBasePath, dataPath, theFolders(f).name))
             cd(fullfile(dropboxBasePath, dataPath, theFolders(f).name));
@@ -98,16 +101,25 @@ for d = 1:length(theDataPaths)
             pupilDiameterMm = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.pupilDiameterMm;
             fieldSizeDegrees = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.fieldSizeDegrees;
             
-            
             % Calculate luminance and chromaticity
             % Load the CIE functions
             load T_xyz1931
             T_xyz = SplineCmf(S_xyz1931,683*T_xyz1931,WlsToS(wls));
             
+            % Get the background spectrum
+            bgSpd = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum; hold on;
+            
             % Calculate luminance and chromaticy
             luminance(f) = T_xyz(2, :)*bgSpd;
             chromaticity(:, f) = (T_xyz([1 2], :)*bgSpd)/sum((T_xyz*bgSpd));
             
+            % Calculate irradiance
+            pupilAreaMm2 = pi*((pupilDiameterMm/2)^2);
+            eyeLengthMm = 17;
+            degPerMm = RetinalMMToDegrees(1,eyeLengthMm);
+            irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpd,S,pupilAreaMm2,eyeLengthMm);
+            irradianceScotTrolands(f) = RetIrradianceToTrolands(irradianceWattsPerUm2, S, 'Scotopic', [], num2str(eyeLengthMm));
+            irradiancePhotTrolands(f) = RetIrradianceToTrolands(irradianceWattsPerUm2, S, 'Photopic', [], num2str(eyeLengthMm));
             
             % Set up the receptor object
             receptorObj = SSTReceptorHuman('obsAgeYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
@@ -125,7 +137,7 @@ for d = 1:length(theDataPaths)
             
             NContrastLevels = size(tmp.cals{end}.modulationAllMeas, 2)-1;
             for kk = 2:NContrastLevels+1
-                bgSpd = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum; hold on;
+                
                 modSpd = tmp.cals{1}.modulationAllMeas(1, kk).meas.pr650.spectrum;
                 
                 % Calculate the nominal contrast
@@ -134,18 +146,22 @@ for d = 1:length(theDataPaths)
                 end
                 postRecepContrasts{kk-1}(:, f) = [1 1 1 ; 1 -1 0]' \ contrasts{kk-1}(:, f);
                 
+                
                 % Increment the counter
             end
             
             
         end
-        c = c+1;
     end
     % Take the average
     lumMean = mean(luminance);
     lumSD = std(luminance);
     chromMean = mean(chromaticity, 2);
     chromSD = std(chromaticity, [], 2);
+    scotTdMean = mean(irradianceScotTrolands);
+    scotTdSD = std(irradianceScotTrolands);
+    photTdMean = mean(irradiancePhotTrolands);
+    photTdSD = std(irradiancePhotTrolands);
     
     for ii = 1:NContrastLevels
         contrastsMean(:, ii) = mean(contrasts{ii}, 2);
@@ -154,10 +170,11 @@ for d = 1:length(theDataPaths)
         postRecepContrastsSD(:, ii) = std(postRecepContrasts{ii}, [], 2);
     end
     
+    % Assemble the data
     Mb = [];
     for ii = 1:NContrastLevels
         M = [];
-        M = [M lumMean lumSD chromMean(1) chromSD(1) chromMean(2) chromSD(2)];
+        M = [M lumMean lumSD scotTdMean log10(scotTdMean) scotTdSD photTdMean log10(photTdMean) photTdSD chromMean(1) chromSD(1) chromMean(2) chromSD(2)];
         for m = 1:size(contrastsMean, 1)
             M = [M 100*contrastsMean(m, ii) 100*contrastsSD(m, ii)];
         end
@@ -167,11 +184,11 @@ for d = 1:length(theDataPaths)
         Mb = [Mb ; M];
     end
     
-    
+    % Write out the data
     for ii = 1:NContrastLevels
         fprintf(fid, '%s,%s,%i,', theStimuli{d}, theObservers{d}, theContrastLevels{d}(ii));
         for jj = 1:size(Mb, 2)
-            if ii > 1 && jj < 7
+            if ii > 1 && jj < 13
                 fprintf(fid, ',');
             else
                 fprintf(fid, '%.2f,', Mb(ii, jj));
