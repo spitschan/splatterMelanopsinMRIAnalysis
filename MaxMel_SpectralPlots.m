@@ -12,10 +12,14 @@ theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxLMS400pct/HERO_asb1/040716/Stimu
     'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_asb1/051016/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
 
 theStimuli = {'LMS 400%' 'LMS CRF' 'Mel 400%' 'Mel CRF' 'Splatter CRF'};
-
-outFig = fullfile(outDir, 'FigureX_Spectra.pdf');
-theFig = figure;
 close all;
+
+outFig1 = fullfile(outDir, 'FigureX_Spectra.pdf');
+theFig = figure;
+
+wls = SToWls([380 2 201]);
+load T_xyz1931
+T_xyz = SplineCmf(S_xyz1931,683*T_xyz1931,WlsToS(wls));
 
 currDir = pwd;
 for d = 1:length(theDataPaths)
@@ -52,6 +56,13 @@ for d = 1:length(theDataPaths)
         % Get the background spectrum
         bgSpd = tmp.cals{1}.modulationBGMeas.predictedSpd; hold on;
         
+        % Extract the chromaticity
+        
+        
+        % Get the background spectrum
+        bgSpd = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum; hold on;
+        chromaticity(:, d) = (T_xyz([1 2], :)*bgSpd)/sum((T_xyz*bgSpd));
+        
         % Set up the color map
         NContrastLevels = size(tmp.cals{1}.modulationAllMeas, 2)-1;
         if NContrastLevels == 1
@@ -74,12 +85,42 @@ for d = 1:length(theDataPaths)
     xlabel('Wavelength [nm]');
     ylabel('Radiance [W/m2/sr/nm]');
     xlim([380 780]);
+    if d < 5
+        ylim([0 0.03]);
+    end
     pbaspect([1 0.3 1]); box off; set(gca, 'TickDir', 'out');
     title(theStimuli{d});
 end
-set(gcf, 'PaperPosition', [0 0 10 10]);
-set(gcf, 'PaperSize', [10 10]);
-set(gcf, 'Color', 'w');
-set(gcf, 'InvertHardcopy', 'off');
-saveas(gcf, outFig, 'pdf');
+set(theFig, 'PaperPosition', [0 0 10 10]);
+set(theFig, 'PaperSize', [10 10]);
+set(theFig, 'Color', 'w');
+set(theFig, 'InvertHardcopy', 'off');
+saveas(theFig, outFig1, 'pdf');
+close(theFig);
+
+%% Plot the chromaticity
+outFig2 = fullfile(outDir, 'FigureX_Chromaticity.pdf');
+theRGB = jet(length(chromaticity));
+theFig = figure;
+for ii = 1:length(chromaticity)
+    h(ii) = plot(chromaticity(1, ii), chromaticity(2, ii), 'Marker', 's', 'Color', 'k', 'MarkerFaceColor', theRGB(ii, :)); hold on;
+end
+% Plot horseshoe
+load T_xyz1931
+out = SplineCmf(S_xyz1931, T_xyz1931, S_xyz1931);
+x = out(1, :)./sum(out);
+y = out(2, :)./sum(out);
+plot([x(1:65) x(1)], [y(1:65) y(1)], '-k');
+xlim([0 0.9]); ylim([0 0.9]);
+legend(h, theStimuli);
+set(theFig, 'PaperPosition', [0 0 5 5]);
+set(theFig, 'PaperSize', [5 5]);
+set(theFig, 'Color', 'w');
+set(theFig, 'InvertHardcopy', 'off');
+saveas(theFig, outFig2, 'pdf');
+xlabel('x'); ylabel('y');
+
+%close(theFig);
+pbaspect([1 1 1]); box off; set(gca, 'TickDir', 'out');
+
 cd(currDir);
