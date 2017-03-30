@@ -74,7 +74,7 @@ for d = 1:length(theDataPaths)
     xlabel('Wavelength [nm]');
     ylabel('Radiance [W/m2/sr/nm]');
     xlim([380 780]);
-    pbaspect([1 1 1]); box off; set(gca, 'TickDir', 'out');
+    pbaspect([1 0.3 1]); box off; set(gca, 'TickDir', 'out');
     title(theStimuli{d});
 end
 set(gcf, 'PaperPosition', [0 0 10 10]);
