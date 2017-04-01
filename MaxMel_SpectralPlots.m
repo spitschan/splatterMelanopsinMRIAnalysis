@@ -14,7 +14,7 @@ theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxLMS400pct/HERO_asb1/040716/Stimu
 theStimuli = {'LMS 400%' 'LMS CRF' 'Mel 400%' 'Mel CRF' 'Splatter CRF'};
 close all;
 
-outFig1 = fullfile(outDir, 'FigureX_Spectra.pdf');
+
 theFig = figure;
 
 wls = SToWls([380 2 201]);
@@ -22,6 +22,12 @@ load T_xyz1931
 T_xyz = SplineCmf(S_xyz1931,683*T_xyz1931,WlsToS(wls));
 
 currDir = pwd;
+LOG_PLOT = true;
+if LOG_PLOT
+    outFig1 = fullfile(outDir, 'FigureX_Spectra_log10.pdf');
+else
+    outFig1 = fullfile(outDir, 'FigureX_Spectra.pdf');
+end
 for d = 1:length(theDataPaths)
     subplot(3, 2, d);
     dataPath = theDataPaths{d};
@@ -61,7 +67,7 @@ for d = 1:length(theDataPaths)
         
         % Get the background spectrum
         bgSpd = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum; hold on;
-        chromaticity(:, d) = (T_xyz([1 2], :)*bgSpd)/sum((T_xyz*bgSpd));
+        chromaticity{d}(1, :) = (T_xyz([1 2], :)*bgSpd)/sum((T_xyz*bgSpd));
         
         % Set up the color map
         NContrastLevels = size(tmp.cals{1}.modulationAllMeas, 2)-1;
@@ -73,20 +79,37 @@ for d = 1:length(theDataPaths)
         for kk = 2:NContrastLevels+1
             % Get the spectrum
             modSpd = tmp.cals{1}.modulationAllMeas(1, kk).predictedSpd;
-            
+            chromaticity{d}(kk, :) = (T_xyz([1 2], :)*modSpd)/sum((T_xyz*modSpd));
             % ... and plot it.
-            plot(wls, modSpd, 'Color', theRGB(kk, :)); hold on;
+            if LOG_PLOT
+                plot(wls, log10(modSpd), 'Color', theRGB(kk, :)); hold on;
+            else
+                plot(wls, modSpd, 'Color', theRGB(kk, :)); hold on;
+            end
+            
         end
         % Plot the background spectrum
-        plot(wls, bgSpd, '-k'); hold on;
+        if LOG_PLOT
+            plot(wls, log10(bgSpd), '-k'); hold on;
+        else
+            plot(wls, bgSpd, '-k'); hold on;
+        end
     end
     
     % Set some plot properties
     xlabel('Wavelength [nm]');
-    ylabel('Radiance [W/m2/sr/nm]');
+    if LOG_PLOT
+        ylabel('Radiance [log W/m2/sr/nm]');
+    else
+        ylabel('Radiance [W/m2/sr/nm]');
+    end
     xlim([380 780]);
-    if d < 5
-        ylim([0 0.03]);
+    if LOG_PLOT
+        ylim([-6 0]);
+    else
+        if d < 5
+            ylim([0 0.03]);
+        end
     end
     pbaspect([1 0.3 1]); box off; set(gca, 'TickDir', 'out');
     title(theStimuli{d});
@@ -102,8 +125,13 @@ close(theFig);
 outFig2 = fullfile(outDir, 'FigureX_Chromaticity.pdf');
 theRGB = jet(length(chromaticity));
 theFig = figure;
-for ii = 1:length(chromaticity)
-    h(ii) = plot(chromaticity(1, ii), chromaticity(2, ii), 'Marker', 's', 'Color', 'k', 'MarkerFaceColor', theRGB(ii, :)); hold on;
+c = 1;
+for dd = [2 4 5]
+    plot(chromaticity{dd}(:, 1), chromaticity{dd}(:, 2), '-k'); hold on;
+    for ii = 1:length(chromaticity{dd})
+        h(c) = plot(chromaticity{dd}(ii, 1), chromaticity{dd}(ii, 2), 'Marker', 's', 'Color', 'k', 'MarkerFaceColor', theRGB(dd, :)); hold on;
+    end
+    c = c+1;
 end
 % Plot horseshoe
 load T_xyz1931
@@ -112,7 +140,34 @@ x = out(1, :)./sum(out);
 y = out(2, :)./sum(out);
 plot([x(1:65) x(1)], [y(1:65) y(1)], '-k');
 xlim([0 0.9]); ylim([0 0.9]);
-legend(h, theStimuli);
+legend(h, theStimuli{[2 4 5]});
+set(theFig, 'PaperPosition', [0 0 5 5]);
+set(theFig, 'PaperSize', [5 5]);
+set(theFig, 'Color', 'w');
+set(theFig, 'InvertHardcopy', 'off');
+saveas(theFig, outFig2, 'pdf');
+xlabel('x'); ylabel('y');
+
+outFig2 = fullfile(outDir, 'FigureX_ChromaticityCloseup.pdf');
+theFig = figure;
+c = 1;
+for dd = [2 4 5]
+    plot(chromaticity{dd}(:, 1), chromaticity{dd}(:, 2), '-k'); hold on;
+    for ii = 1:length(chromaticity{dd})
+        h(c) = plot(chromaticity{dd}(ii, 1), chromaticity{dd}(ii, 2), 'Marker', 's', 'Color', 'k', 'MarkerFaceColor', theRGB(dd, :)); hold on;
+    end
+    plot(chromaticity{dd}(1, 1), chromaticity{dd}(1, 2), 'sk', 'MarkerFaceColor', 'k');
+    c = c+1;
+end
+
+% Plot horseshoe
+load T_xyz1931
+out = SplineCmf(S_xyz1931, T_xyz1931, S_xyz1931);
+x = out(1, :)./sum(out);
+y = out(2, :)./sum(out);
+plot([x(1:65) x(1)], [y(1:65) y(1)], '-k');
+xlim([0.4 0.7]); ylim([0.25 0.55]);
+legend(h, theStimuli{[2 4 5]});
 set(theFig, 'PaperPosition', [0 0 5 5]);
 set(theFig, 'PaperSize', [5 5]);
 set(theFig, 'Color', 'w');
