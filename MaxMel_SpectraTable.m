@@ -22,7 +22,7 @@ load T_xyz1931
 T_xyz = SplineCmf(S_xyz1931,683*T_xyz1931,WlsToS(wls));
 
 currDir = pwd;
-LOG_PLOT = false;
+LOG_PLOT = true;
 if LOG_PLOT
     outFig1 = fullfile(outDir, 'FigureX_Spectra_log10.pdf');
 else
@@ -62,9 +62,9 @@ for d = 1:length(theDataPaths)
         tmp = load(theMATFile.name);
         
         % Get the background spectrum
-        bgSpd = tmp.cals{1}.modulationBGMeas.predictedSpd; hold on;
-        
-        % Extract the chromaticity
+        bgSpd = tmp.cals{1}.modulationBGMeas.predictedSpd; hold on;ff
+        % Get the background spectrum
+        bgSpd = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum; hold on;
         chromaticity{d}(1, :) = (T_xyz([1 2], :)*bgSpd)/sum((T_xyz*bgSpd));
         
         % Set up the color map
@@ -86,91 +86,6 @@ for d = 1:length(theDataPaths)
             end
             
         end
-        % Plot the background spectrum
-        if LOG_PLOT
-            plot(wls, log10(bgSpd), '-k'); hold on;
-        else
-            plot(wls, bgSpd, '-k'); hold on;
-        end
     end
-    
-    % Set some plot properties
-    xlabel('Wavelength [nm]');
-    if LOG_PLOT
-        ylabel('Radiance [log W/m2/sr/nm]');
-    else
-        ylabel('Radiance [W/m2/sr/nm]');
-    end
-    xlim([380 780]);
-    if LOG_PLOT
-        ylim([-6 0]);
-    else
-        if d < 5
-            ylim([0 0.03]);
-        end
-    end
-    pbaspect([1 0.3 1]); box off; set(gca, 'TickDir', 'out');
-    title(theStimuli{d});
 end
-set(theFig, 'PaperPosition', [0 0 10 10]);
-set(theFig, 'PaperSize', [10 10]);
-set(theFig, 'Color', 'w');
-set(theFig, 'InvertHardcopy', 'off');
-saveas(theFig, outFig1, 'pdf');
-close(theFig);
-
-%% Plot the chromaticity
-outFig2 = fullfile(outDir, 'FigureX_Chromaticity.pdf');
-theRGB = jet(length(chromaticity));
-theFig = figure;
-c = 1;
-for dd = 1:length(theDataPaths);
-        h(c) = plot(chromaticity{dd}(1, 1), chromaticity{dd}(1, 2), 'Marker', 's', 'Color', 'k', 'MarkerFaceColor', theRGB(dd, :)); hold on;
-    c = c+1;
-end
-% Plot horseshoe
-load T_xyz1931
-out = SplineCmf(S_xyz1931, T_xyz1931, S_xyz1931);
-x = out(1, :)./sum(out);
-y = out(2, :)./sum(out);
-plot([x(1:65) x(1)], [y(1:65) y(1)], '-k');
-xlim([0 0.9]); ylim([0 0.9]);
-legend(h, theStimuli);
-set(theFig, 'PaperPosition', [0 0 5 5]);
-set(theFig, 'PaperSize', [5 5]);
-set(theFig, 'Color', 'w');
-set(theFig, 'InvertHardcopy', 'off');
-saveas(theFig, outFig2, 'pdf');
-xlabel('x'); ylabel('y');
-
-outFig2 = fullfile(outDir, 'FigureX_ChromaticityCloseup.pdf');
-theFig = figure;
-c = 1;
-for dd = [2 4 5]
-    plot(chromaticity{dd}(:, 1), chromaticity{dd}(:, 2), '-k'); hold on;
-    for ii = 1:length(chromaticity{dd})
-        h(c) = plot(chromaticity{dd}(ii, 1), chromaticity{dd}(ii, 2), 'Marker', 's', 'Color', 'k', 'MarkerFaceColor', theRGB(dd, :)); hold on;
-    end
-    plot(chromaticity{dd}(1, 1), chromaticity{dd}(1, 2), 'sk', 'MarkerFaceColor', 'k');
-    c = c+1;
-end
-
-% Plot horseshoe
-load T_xyz1931
-out = SplineCmf(S_xyz1931, T_xyz1931, S_xyz1931);
-x = out(1, :)./sum(out);
-y = out(2, :)./sum(out);
-plot([x(1:65) x(1)], [y(1:65) y(1)], '-k');
-xlim([0.4 0.7]); ylim([0.25 0.55]);
-legend(h, theStimuli{[2 4 5]});
-set(theFig, 'PaperPosition', [0 0 5 5]);
-set(theFig, 'PaperSize', [5 5]);
-set(theFig, 'Color', 'w');
-set(theFig, 'InvertHardcopy', 'off');
-saveas(theFig, outFig2, 'pdf');
-xlabel('x'); ylabel('y');
-
-%close(theFig);
-pbaspect([1 1 1]); box off; set(gca, 'TickDir', 'out');
-
 cd(currDir);
