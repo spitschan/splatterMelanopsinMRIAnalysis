@@ -47,7 +47,7 @@ theContrastLevels = {[400] [400] [400] [400] ...
     [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
 
 fid = fopen(fullfile(outDir, 'TableX_Splatter.csv'), 'w');
-fprintf(fid, 'Stimulus,Observer,Nominal contrast [%s],Luminance [cd/m2],SD,Irradiance [sc td],[log10 sc td],SD,Irradiance [ph td],[log10 ph td],SD,x chromaticity,SD,y chromaticity,SD,L contrast [%s],SD,M contrast [%s],SD,S contrast [%s],SD,LMS contrast [%s],SD,L-M contrast [%s],SD\n', '%', '%', '%', '%', '%', '%');
+fprintf(fid, 'Stimulus,Observer,Nominal contrast [%s],Luminance [cd/m2],SD,Irradiance [sc td],[log10 sc td],SD,Irradiance [ph td],[log10 ph td],SD,x chromaticity,SD,y chromaticity,SD,L contrast [%s],SD,M contrast [%s],SD,S contrast [%s],SD,Melanopsin contrast [%s],SD,Rod contrast [%s],SD,LMS contrast [%s],SD,L-M contrast [%s],SD\n', '%', '%', '%', '%', '%', '%', '%', '%');
 
 currDir = pwd;
 Mc = [];
@@ -135,22 +135,17 @@ for d = 1:length(theDataPaths)
                 end
             end
             
+            % Calcualte the contrast
             NContrastLevels = size(tmp.cals{end}.modulationAllMeas, 2)-1;
             for kk = 2:NContrastLevels+1
-                
                 modSpd = tmp.cals{1}.modulationAllMeas(1, kk).meas.pr650.spectrum;
                 
                 % Calculate the nominal contrast
                 for jj = 1:size(T_rec, 1)
                     contrasts{kk-1}(:, f) = (T_rec*(modSpd-bgSpd))./(T_rec*bgSpd);
                 end
-                postRecepContrasts{kk-1}(:, f) = [1 1 1 ; 1 -1 0]' \ contrasts{kk-1}(:, f);
-                
-                
-                % Increment the counter
+                postRecepContrasts{kk-1}(:, f) = [1 1 1 0 0; 1 -1 0 0 0]' \ contrasts{kk-1}(:, f);
             end
-            
-            
         end
     end
     % Take the average
