@@ -1,6 +1,6 @@
 % Define the paths
 dropboxBasePath = '/Users/spitschan/Dropbox (Aguirre-Brainard Lab)';
-outDir = fullfile(pwd, 'tables');
+outDir = fullfile(pwd, 'figures');
 if ~isdir(outDir)
     mkdir(outDir);
 end
@@ -13,21 +13,29 @@ theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_asb1/032416/Stimu
     'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_aso1/053116/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
     'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_gka1/060216/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
     'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_mxs1/060916/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_mxs1/061016/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation'};
+    'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_mxs1/061016/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
+    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_asb1/051016/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_aso1/042916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_gka1/050616/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_mxs1/050916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
+
 
 theStimuli = {'Mel 400%' 'Mel 400%'  'Mel 400%'  'Mel 400%'  ...
-    'Mel CRF'  'Mel CRF'  'Mel CRF'  'Mel CRF' 'Mel CRF'};
+    'Mel CRF'  'Mel CRF'  'Mel CRF'  'Mel CRF' 'Mel CRF' ...
+    'Splatter CRF' 'Splatter CRF' 'Splatter CRF'  'Splatter CRF'};
 theObservers = {'ASB' 'ASO' 'GKA' 'MXS' ...
-    'ASB' 'ASO' 'GKA' 'MXS [1]' 'MXS [2]'};
+    'ASB' 'ASO' 'GKA' 'MXS [1]' 'MXS [2]' ...
+    'ASB' 'ASO' 'GKA' 'MXS'};
 theContrastLevels = {[400] [400] [400] [400] ...
-    [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400]};
-
+    [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] ...
+    [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
 wls = SToWls([380 2 201]);
 
 currDir = pwd;
 Mc = [];
 for d = 1:length(theDataPaths)
-    outFile = fullfile(outDir, ['TableX_Spectra' theStimuli{d} '_' theObservers{d} '.csv']);
+    outFile1 = fullfile(outDir, [theStimuli{d} '_' theObservers{d} '_LM.png']);
+    outFile2 = fullfile(outDir, [theStimuli{d} '_' theObservers{d} '_S.png']);
     dataPath = theDataPaths{d};
     
     % Find the folders
@@ -99,7 +107,7 @@ for d = 1:length(theDataPaths)
         for ii = 1:NSamples
             T_receptors = receptorObj.Ts{ii}.T_energyNormalized;
             for jj = 1:size(receptorObj.Ts{ii}.T_energyNormalized, 1)
-                contrasts(jj, ii) = (T_receptors(jj, :)*(modSpdValMean-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
+                contrasts(jj, ii) = (T_receptors(jj, :)*(modSpdValMean(:, end)-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
             end
             postRecepContrasts(:, ii) = [1 1 0 ; 1 -1 0 ; 0 0 1]' \ contrasts(:, ii);
         end
@@ -123,7 +131,7 @@ for d = 1:length(theDataPaths)
         set(fig1, 'Color', 'w');
         set(fig1, 'InvertHardcopy', 'off');
         cd(currDir);
-        saveas(fig1, 'LMLMinusMSplatter.png', 'png');
+        saveas(fig1, outFile1, 'png');
         
         fig2 = figure;
         XAxLims = [-0.1 0.1]; YAxLims = [-0.3 0.3];
@@ -142,11 +150,8 @@ for d = 1:length(theDataPaths)
         set(fig2, 'PaperSize', [6 6]);
         set(fig2, 'Color', 'w');
         set(fig2, 'InvertHardcopy', 'off');
-        saveas(fig2, 'SSplatter.png', 'png');
-        keyboard
+        saveas(fig2, outFile2, 'png');
     end
-    
-    
 end
 
 
