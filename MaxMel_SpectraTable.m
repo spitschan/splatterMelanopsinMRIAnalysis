@@ -98,7 +98,7 @@ for d = 1:length(theDataPaths)
             tmp = load(theMATFile.name);
             
             % Get the background spectrum
-            bgSpdVal(:, f) = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum; hold on;
+            bgSpdVal(:, f) = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum;
             bgSpdNom = tmp.cals{1}.describe.cache.data(theObserverAge(d)).backgroundSpd;
             
             % Calculate the contrast
@@ -152,7 +152,6 @@ for d = 1:length(theDataPaths)
         end
         Mc = [Mc modSpdValMean(:, ii)];
     end
-    
     fprintf(fid, '%s', theString);
     fprintf(fid, '\n');
     fclose(fid);
