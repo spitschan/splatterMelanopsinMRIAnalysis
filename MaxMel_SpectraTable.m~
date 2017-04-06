@@ -1,6 +1,6 @@
 % Define the paths
 dropboxBasePath = '/Users/spitschan/Dropbox (Aguirre-Brainard Lab)';
-outDir = fullfile(pwd, 'tables');
+outDir = fullfile(pwd, 'tables', 'spectra');
 if ~isdir(outDir)
     mkdir(outDir);
 end
@@ -38,32 +38,36 @@ theObservers = {'ASB' 'ASO' 'GKA' 'MXS' ...
     'ASB' 'ASO' 'GKA' 'MXS' ...
     'ASB' 'ASO' 'GKA' 'MXS [1]' 'MXS [2]' ...
     'ASB' 'ASO' 'GKA' 'MXS'};
-theObserverAge = [32 28 44 29 32 28 44 29 29 32 28 44 29 32 28 44 29 29 32 28 44 29];
-theValidatedObserverAge = [32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32];
 theContrastLevels = {[400] [400] [400] [400] ...
     [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] ...
     [400] [400] [400] [400] ...
     [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] ...
     [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
+theContrastScalars = {[1] [1] [1] [1] ...
+    [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] ...
+    [1] [1] [1] [1] ...
+    [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] ...
+    [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
+theObserverAge = [32 28 44 29 32 28 44 29 29 32 28 44 29 32 28 44 29 29 32 28 44 29];
+theValidatedObserverAge = [32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32];
 
-fid = fopen(fullfile(outDir, 'TableX_Splatter.csv'), 'w');
-fprintf(fid, 'Stimulus,Observer,Actual observer age,Validated observer age,Nominal contrast [%s],Luminance [cd/m2],SD,Irradiance [sc td],[log10 sc td],SD,Irradiance [ph td],[log10 ph td],SD,x chromaticity,SD,y chromaticity,SD,L contrast [%s],SD,M contrast [%s],SD,S contrast [%s],SD,Melanopsin contrast [%s],SD,Rod contrast [%s],SD,LMS contrast [%s],SD,L-M contrast [%s],SD\n', '%', '%', '%', '%', '%', '%', '%', '%');
+wls = SToWls([380 2 201]);
 
 currDir = pwd;
 Mc = [];
 for d = 1:length(theDataPaths)
+    outFile = fullfile(outDir, [theStimuli{d} '_' theObservers{d} '.csv']);
+    fid = fopen(outFile, 'w');
     dataPath = theDataPaths{d};
     
     % Find the folders
     theFolders = dir(fullfile(dropboxBasePath, dataPath));
     
     % Increment the counter
-    clear contrasts;
-    clear postRecepContrasts;
-    clear luminance;
-    clear chromaticity;
-    clear irradianceScotTrolands;
-    clear irradiancePhotTrolands;
+    clear bgSpdVal;
+    clear modSpdVal;
+    clear modSpdValMean;
+    clear modSpdValSD;
     
     for k = length(theFolders):-1:1
         % remove non-folders
@@ -93,106 +97,66 @@ for d = 1:length(theDataPaths)
             % Load the MAT file
             tmp = load(theMATFile.name);
             
-            % Extract the infomation
-            observerAgeInYrs = tmp.cals{1}.describe.cache.REFERENCE_OBSERVER_AGE;
-            fractionBleached = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.fractionBleached;
-            pupilDiameterMm = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.pupilDiameterMm;
-            fieldSizeDegrees = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.fieldSizeDegrees;
-            S = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.S;
-            wls = SToWls(S);
-            
-            % Calculate luminance and chromaticity
-            % Load the CIE functions
-            load T_xyz1931
-            T_xyz = SplineCmf(S_xyz1931,683*T_xyz1931,WlsToS(wls));
-            
             % Get the background spectrum
-            bgSpd = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum; hold on;
+            bgSpdVal(:, f) = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum; hold on;
+            bgSpdNom = tmp.cals{1}.describe.cache.data(theObserverAge(d)).backgroundSpd;
             
-            % Calculate luminance and chromaticy
-            luminance(f) = T_xyz(2, :)*bgSpd;
-            chromaticity(:, f) = (T_xyz([1 2], :)*bgSpd)/sum((T_xyz*bgSpd));
-            
-            % Calculate irradiance
-            pupilAreaMm2 = pi*((pupilDiameterMm/2)^2);
-            eyeLengthMm = 17;
-            degPerMm = RetinalMMToDegrees(1,eyeLengthMm);
-            irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpd,S,pupilAreaMm2,eyeLengthMm);
-            irradianceScotTrolands(f) = RetIrradianceToTrolands(irradianceWattsPerUm2, S, 'Scotopic', [], num2str(eyeLengthMm));
-            irradiancePhotTrolands(f) = RetIrradianceToTrolands(irradianceWattsPerUm2, S, 'Photopic', [], num2str(eyeLengthMm));
-            
-            % Set up the receptor object
-            receptorObj = SSTReceptorHuman('obsAgeYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
-            T_rec = receptorObj.T.T_energyNormalized;
-            T_val = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.T_receptors;
-            
-            % Calculate the numerical difference between the assumed and the
-            % reconstructed receptor sensitivities
-            for ii = 1:size(T_rec, 1)-1
-                tmp1 = sum(T_rec(1, :) - T_val(1, :));
-                if tmp1 > 0
-                    error('Error: Couldn''t reconstruct receptor sensitivities...');
-                end
-            end
-            
-            % Calcualte the contrast
+            % Calculate the contrast
             NContrastLevels = size(tmp.cals{end}.modulationAllMeas, 2)-1;
             for kk = 2:NContrastLevels+1
-                modSpd = tmp.cals{1}.modulationAllMeas(1, kk).meas.pr650.spectrum;
-                
-                % Calculate the nominal contrast
-                for jj = 1:size(T_rec, 1)
-                    contrasts{kk-1}(:, f) = (T_rec*(modSpd-bgSpd))./(T_rec*bgSpd);
-                end
-                postRecepContrasts{kk-1}(:, f) = [1 1 1 0 0; 1 -1 0 0 0]' \ contrasts{kk-1}(:, f);
+                modSpdVal{kk-1}(:, f) = tmp.cals{1}.modulationAllMeas(1, kk).meas.pr650.spectrum;
+                modSpdNom(:, kk-1) = tmp.cals{1}.describe.cache.data(theObserverAge(d)).backgroundSpd+theContrastScalars(
+                tmp.cals{1}.describe.cache.data(theObserverAge(d)).modulationSpdSignedPositive;
             end
         end
-    end
-    % Take the average
-    lumMean = mean(luminance);
-    lumSD = std(luminance);
-    chromMean = mean(chromaticity, 2);
-    chromSD = std(chromaticity, [], 2);
-    scotTdMean = mean(irradianceScotTrolands);
-    scotTdSD = std(irradianceScotTrolands);
-    photTdMean = mean(irradiancePhotTrolands);
-    photTdSD = std(irradiancePhotTrolands);
-    
-    for ii = 1:NContrastLevels
-        contrastsMean(:, ii) = mean(contrasts{ii}, 2);
-        contrastsSD(:, ii) = std(contrasts{ii}, [], 2);
-        postRecepContrastsMean(:, ii) = mean(postRecepContrasts{ii}, 2);
-        postRecepContrastsSD(:, ii) = std(postRecepContrasts{ii}, [], 2);
+        
+        bgSpdValMean = mean(bgSpdVal, 2);
+        bgSpdValSD = std(bgSpdVal, [], 2);
+        
+        for kk = 1:NContrastLevels
+            modSpdValMean(:, kk) = mean(modSpdVal{kk}, 2);
+            modSpdValSD(:, kk) = std(modSpdVal{kk}, [], 2);
+        end
     end
     
-    % Assemble the data
-    Mb = [];
+    
+    % Gather all the spectra
+    theHeader = [theObservers{d} ', ' theStimuli{d}];
+    theString = sprintf('Wavelength [nm],Background nominal [%i yrs],', theObserverAge(d));
+    Mc = [wls];
+    % First the nominal ones
+    Mc = [Mc bgSpdNom];
     for ii = 1:NContrastLevels
-        M = [];
-        M = [M lumMean lumSD scotTdMean log10(scotTdMean) scotTdSD photTdMean log10(photTdMean) photTdSD chromMean(1) chromSD(1) chromMean(2) chromSD(2)];
-        for m = 1:size(contrastsMean, 1)
-            M = [M 100*contrastsMean(m, ii) 100*contrastsSD(m, ii)];
+        if strcmp(theStimuli{d}, 'Splatter CRF')
+            theString = [theString sprintf('Modulation nominal [x%.2f %i yrs],', ...
+                theContrastLevels{d}(ii), theObserverAge(d))];
+        else
+            theString = [theString sprintf('Modulation nominal [%i%s %i yrs],', ...
+                theContrastLevels{d}(ii), '%', theObserverAge(d))];
         end
-        for m = 1:size(postRecepContrastsMean, 1)
-            M = [M 100*postRecepContrastsMean(m, ii) 100*postRecepContrastsSD(m, ii)];
-        end
-        Mb = [Mb ; M];
+        Mc = [Mc modSpdNom(:, ii)];
     end
     
-    % Write out the data
+    % Then the validated ones
+    theString = [theString sprintf('Background validated [%i yrs],', theValidatedObserverAge(d))];
+    Mc = [Mc bgSpdValMean];
     for ii = 1:NContrastLevels
-        fprintf(fid, '%s,%s,%i,%i,%.2f,', theStimuli{d}, theObservers{d}, theObserverAge(d), theValidatedObserverAge(d), theContrastLevels{d}(ii));
-        for jj = 1:size(Mb, 2)
-            if ii > 1 && jj < 13
-                fprintf(fid, ',');
-            else
-                fprintf(fid, '%.2f,', Mb(ii, jj));
-            end
+        if strcmp(theStimuli{d}, 'Splatter CRF')
+            theString = [theString sprintf('Modulation validated [x%.2f %i yrs]', ...
+                theContrastLevels{d}(ii), theValidatedObserverAge(d))];
+        else
+            theString = [theString sprintf('Modulation validated [%i%s %i yrs]', ...
+                theContrastLevels{d}(ii), '%', theValidatedObserverAge(d))];
         end
-        fprintf(fid, '\n');
+        if ii < NContrastLevels
+            theString = [theString ','];
+        end
+        Mc = [Mc modSpdValMean(:, ii)];
     end
+    
+    fprintf(fid, '%s', theString);
     fprintf(fid, '\n');
-    fprintf(fid, '\n');
+    fclose(fid);
+    dlmwrite(outFile, Mc, '-append');
 end
 cd(currDir);
-fclose(fid);

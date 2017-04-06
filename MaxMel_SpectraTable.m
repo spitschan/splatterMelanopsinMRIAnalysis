@@ -1,6 +1,6 @@
 % Define the paths
 dropboxBasePath = '/Users/spitschan/Dropbox (Aguirre-Brainard Lab)';
-outDir = fullfile(pwd, 'tables');
+outDir = fullfile(pwd, 'tables', 'spectra');
 if ~isdir(outDir)
     mkdir(outDir);
 end
@@ -43,16 +43,21 @@ theContrastLevels = {[400] [400] [400] [400] ...
     [400] [400] [400] [400] ...
     [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] ...
     [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
-
-%fid = fopen(fullfile(outDir, 'TableX_Spectra.csv'), 'w');
-fprintf(fid, 'Stimulus,Observer,Nominal contrast [%s],Luminance [cd/m2],SD,Irradiance [sc td],[log10 sc td],SD,Irradiance [ph td],[log10 ph td],SD,x chromaticity,SD,y chromaticity,SD,L contrast [%s],SD,M contrast [%s],SD,S contrast [%s],SD,Melanopsin contrast [%s],SD,Rod contrast [%s],SD,LMS contrast [%s],SD,L-M contrast [%s],SD\n', '%', '%', '%', '%', '%', '%', '%', '%');
+theContrastScalars = {[1] [1] [1] [1] ...
+    [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] ...
+    [1] [1] [1] [1] ...
+    [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] [1/16 1/8 1/4 1/2 1] ...
+    [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
+theObserverAge = [32 28 44 29 32 28 44 29 29 32 28 44 29 32 28 44 29 29 32 28 44 29];
+theValidatedObserverAge = [32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32];
 
 wls = SToWls([380 2 201]);
 
 currDir = pwd;
 Mc = [];
 for d = 1:length(theDataPaths)
-    outFile = fullfile(outDir, ['TableX_Spectra' theStimuli{d} '_' theObservers{d} '.csv']);
+    outFile = fullfile(outDir, [theStimuli{d} '_' theObservers{d} '.csv']);
+    fid = fopen(outFile, 'w');
     dataPath = theDataPaths{d};
     
     % Find the folders
@@ -94,14 +99,13 @@ for d = 1:length(theDataPaths)
             
             % Get the background spectrum
             bgSpdVal(:, f) = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum; hold on;
-            plot(bgSpdNom); hold on
-            bgSpdNom = tmp.cals{1}.modulationBGMeas.predictedSpd;
+            bgSpdNom = tmp.cals{1}.describe.cache.data(theObserverAge(d)).backgroundSpd;
             
             % Calculate the contrast
             NContrastLevels = size(tmp.cals{end}.modulationAllMeas, 2)-1;
             for kk = 2:NContrastLevels+1
                 modSpdVal{kk-1}(:, f) = tmp.cals{1}.modulationAllMeas(1, kk).meas.pr650.spectrum;
-                modSpdNom(:, kk-1)= tmp.cals{1}.modulationAllMeas(1, kk).predictedSpd;
+                modSpdNom(:, kk-1) = tmp.cals{1}.describe.cache.data(theObserverAge(d)).backgroundSpd+theContrastScalars{d}(kk-1)*tmp.cals{1}.describe.cache.data(theObserverAge(d)).differenceSpd;
             end
         end
         
@@ -114,19 +118,44 @@ for d = 1:length(theDataPaths)
         end
     end
     
+    
     % Gather all the spectra
     theHeader = [theObservers{d} ', ' theStimuli{d}];
-    theString = 'Background nominal,Background validated,';
-    Mc = [];
-    Mc = [Mc bgSpdNom bgSpdValMean];
+    theString = sprintf('Wavelength [nm],Background nominal [%i yrs],', theObserverAge(d));
+    Mc = [wls];
+    % First the nominal ones
+    Mc = [Mc bgSpdNom];
     for ii = 1:NContrastLevels
-        theString = [theString sprintf('Modulation nominal [%i%s],Modulation validated [%i%s]', ...
-            theContrastLevels{d}(ii), '%', theContrastLevels{d}(ii), '%')];
-        Mc = [Mc modSpdNom(:, ii) modSpdValMean(:, ii)];
+        if strcmp(theStimuli{d}, 'Splatter CRF')
+            theString = [theString sprintf('Modulation nominal [x%.2f %i yrs],', ...
+                theContrastLevels{d}(ii), theObserverAge(d))];
+        else
+            theString = [theString sprintf('Modulation nominal [%i%s %i yrs],', ...
+                theContrastLevels{d}(ii), '%', theObserverAge(d))];
+        end
+        Mc = [Mc modSpdNom(:, ii)];
     end
+    
+    % Then the validated ones
+    theString = [theString sprintf('Background validated [%i yrs],', theValidatedObserverAge(d))];
+    Mc = [Mc bgSpdValMean];
+    for ii = 1:NContrastLevels
+        if strcmp(theStimuli{d}, 'Splatter CRF')
+            theString = [theString sprintf('Modulation validated [x%.2f %i yrs]', ...
+                theContrastLevels{d}(ii), theValidatedObserverAge(d))];
+        else
+            theString = [theString sprintf('Modulation validated [%i%s %i yrs]', ...
+                theContrastLevels{d}(ii), '%', theValidatedObserverAge(d))];
+        end
+        if ii < NContrastLevels
+            theString = [theString ','];
+        end
+        Mc = [Mc modSpdValMean(:, ii)];
+    end
+    
+    fprintf(fid, '%s', theString);
+    fprintf(fid, '\n');
+    fclose(fid);
     dlmwrite(outFile, Mc, '-append');
 end
-
-
 cd(currDir);
-fclose(fid);
