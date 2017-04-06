@@ -85,75 +85,72 @@ for d = 1:length(theDataPaths)
                 modSpdVal{kk-1}(:, f) = tmp.cals{1}.modulationAllMeas(1, kk).meas.pr650.spectrum;
             end
         end
-        
-        bgSpdValMean = mean(bgSpdVal, 2);
-        bgSpdValSD = std(bgSpdVal, [], 2);
-        
-        for kk = 1:NContrastLevels
-            modSpdValMean(:, kk) = mean(modSpdVal{kk}, 2);
-            modSpdValSD(:, kk) = std(modSpdVal{kk}, [], 2);
-        end
-        
-        
-        %% Make the receptor object
-        observerAgeInYrs = tmp.cals{1}.describe.cache.REFERENCE_OBSERVER_AGE;
-        fractionBleached = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.fractionBleached;
-        pupilDiameterMm = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.pupilDiameterMm;
-        fieldSizeDegrees = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.fieldSizeDegrees;
-        receptorObj = SSTReceptorHuman('obsAgeYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
-        NSamples = 1000;
-        receptorObj.makeSpectralSensitivitiesStochastic('NSamples', NSamples);
-        
-        for ii = 1:NSamples
-            T_receptors = receptorObj.Ts{ii}.T_energyNormalized;
-            for jj = 1:size(receptorObj.Ts{ii}.T_energyNormalized, 1)
-                contrasts(jj, ii) = (T_receptors(jj, :)*(modSpdValMean(:, end)-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
-            end
-            postRecepContrasts(:, ii) = [1 1 0 ; 1 -1 0 ; 0 0 1]' \ contrasts(:, ii);
-        end
-        
-        theRGB = DefaultReceptorColors;
-        fig1 = figure;
-        XAxLims = [-0.1 0.1]; YAxLims = [-0.1 0.1];
-        XNominalContrast = 0; YNominalContrast = 0;
-        ScatterplotWithHistogram(postRecepContrasts(1, :), postRecepContrasts(2, :), ...
-            'XLim', XAxLims, 'YLim', YAxLims, 'XBinWidth', 0.01, 'YBinWidth', 0.01, ...
-            'XLabel', 'L+M contrast', 'YLabel', 'L-M contrast', ...
-            'XRefLines', [XAxLims ; YNominalContrast YNominalContrast], ...
-            'YRefLines', [XNominalContrast XNominalContrast ; YAxLims], ...
-            'XNominalContrast', XNominalContrast, ...
-            'YNominalContrast', YNominalContrast, ...
-            'Color', [theRGB(1, :) ; theRGB(2, :)]);
-        
-        % Save the figure
-        set(fig1, 'PaperPosition', [0 0 6 6]);
-        set(fig1, 'PaperSize', [6 6]);
-        set(fig1, 'Color', 'w');
-        set(fig1, 'InvertHardcopy', 'off');
-        cd(currDir);
-        saveas(fig1, outFile1, 'png');
-        
-        fig2 = figure;
-        XAxLims = [-0.1 0.1]; YAxLims = [-0.3 0.3];
-        XNominalContrast = 0; YNominalContrast = 0;
-        ScatterplotWithHistogram(postRecepContrasts(1, :), postRecepContrasts(3, :), ...
-            'XLim', XAxLims, 'YLim', YAxLims, 'XBinWidth', 0.01, 'YBinWidth', 0.03, ...
-            'XLabel', 'L+M contrast', 'YLabel', 'S contrast', ...
-            'XRefLines', [XAxLims ; YNominalContrast YNominalContrast], ...
-            'YRefLines', [XNominalContrast XNominalContrast ; YAxLims], ...
-            'XNominalContrast', XNominalContrast, ...
-            'YNominalContrast', YNominalContrast, ...
-            'Color', [theRGB(1, :) ; theRGB(3, :)]);
-        
-        % Save the figure
-        set(fig2, 'PaperPosition', [0 0 6 6]);
-        set(fig2, 'PaperSize', [6 6]);
-        set(fig2, 'Color', 'w');
-        set(fig2, 'InvertHardcopy', 'off');
-        saveas(fig2, outFile2, 'png');
     end
+    bgSpdValMean = mean(bgSpdVal, 2);
+    bgSpdValSD = std(bgSpdVal, [], 2);
+    
+    for kk = 1:NContrastLevels
+        modSpdValMean(:, kk) = mean(modSpdVal{kk}, 2);
+        modSpdValSD(:, kk) = std(modSpdVal{kk}, [], 2);
+    end
+    
+    
+    %% Make the receptor object
+    observerAgeInYrs = tmp.cals{1}.describe.cache.REFERENCE_OBSERVER_AGE;
+    fractionBleached = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.fractionBleached;
+    pupilDiameterMm = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.pupilDiameterMm;
+    fieldSizeDegrees = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.fieldSizeDegrees;
+    receptorObj = SSTReceptorHuman('obsAgeYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
+    NSamples = 1000;
+    receptorObj.makeSpectralSensitivitiesStochastic('NSamples', NSamples);
+    
+    for ii = 1:NSamples
+        T_receptors = receptorObj.Ts{ii}.T_energyNormalized;
+        for jj = 1:size(receptorObj.Ts{ii}.T_energyNormalized, 1)
+            contrasts(jj, ii) = (T_receptors(jj, :)*(modSpdValMean(:, end)-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
+        end
+        postRecepContrasts(:, ii) = [1 1 0 ; 1 -1 0 ; 0 0 1]' \ contrasts(:, ii);
+    end
+    
+    theRGB = DefaultReceptorColors;
+    fig1 = figure;
+    XAxLims = [-0.1 0.1]; YAxLims = [-0.1 0.1];
+    XNominalContrast = 0; YNominalContrast = 0;
+    ScatterplotWithHistogram(postRecepContrasts(1, :), postRecepContrasts(2, :), ...
+        'XLim', XAxLims, 'YLim', YAxLims, 'XBinWidth', 0.01, 'YBinWidth', 0.01, ...
+        'XLabel', 'L+M contrast', 'YLabel', 'L-M contrast', ...
+        'XRefLines', [XAxLims ; YNominalContrast YNominalContrast], ...
+        'YRefLines', [XNominalContrast XNominalContrast ; YAxLims], ...
+        'XNominalContrast', XNominalContrast, ...
+        'YNominalContrast', YNominalContrast, ...
+        'Color', [theRGB(1, :) ; theRGB(2, :)]);
+    
+    % Save the figure
+    set(fig1, 'PaperPosition', [0 0 6 6]);
+    set(fig1, 'PaperSize', [6 6]);
+    set(fig1, 'Color', 'w');
+    set(fig1, 'InvertHardcopy', 'off');
+    cd(currDir);
+    saveas(fig1, outFile1, 'png');
+    
+    fig2 = figure;
+    XAxLims = [-0.1 0.1]; YAxLims = [-0.3 0.3];
+    XNominalContrast = 0; YNominalContrast = 0;
+    ScatterplotWithHistogram(postRecepContrasts(1, :), postRecepContrasts(3, :), ...
+        'XLim', XAxLims, 'YLim', YAxLims, 'XBinWidth', 0.01, 'YBinWidth', 0.03, ...
+        'XLabel', 'L+M contrast', 'YLabel', 'S contrast', ...
+        'XRefLines', [XAxLims ; YNominalContrast YNominalContrast], ...
+        'YRefLines', [XNominalContrast XNominalContrast ; YAxLims], ...
+        'XNominalContrast', XNominalContrast, ...
+        'YNominalContrast', YNominalContrast, ...
+        'Color', [theRGB(1, :) ; theRGB(3, :)]);
+    
+    % Save the figure
+    set(fig2, 'PaperPosition', [0 0 6 6]);
+    set(fig2, 'PaperSize', [6 6]);
+    set(fig2, 'Color', 'w');
+    set(fig2, 'InvertHardcopy', 'off');
+    saveas(fig2, outFile2, 'png');
+    close(fig1); close(fig2);
+    
 end
-
-
-
-fclose(fid);
