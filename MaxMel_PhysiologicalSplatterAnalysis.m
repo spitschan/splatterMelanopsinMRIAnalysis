@@ -5,6 +5,7 @@ if ~isdir(outDir)
     mkdir(outDir);
 end
 
+% Define the data paths
 theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_asb1/060716/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
     'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_aso1/053116/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
     'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_gka1/060216/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
@@ -14,7 +15,17 @@ theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_asb1/060716/Stimulus
     'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_gka1/050616/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
     'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_mxs1/050916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
 
+% theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_asb1/032416/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
+%     'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_aso1/032516/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
+%     'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_gka1/033116/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
+%     'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_mxs1/040616/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
+%     'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_asb1/051016/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+%     'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_aso1/042916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+%     'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_gka1/050616/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+%     'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_mxs1/050916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
+% 
 
+% Define some meta data manually
 theStimuli = {'Mel 400%' 'Mel 400%'  'Mel 400%'  'Mel 400%'  ...
     'Mel CRF'  'Mel CRF'  'Mel CRF'  'Mel CRF' 'Mel CRF' ...
     'Splatter CRF' 'Splatter CRF' 'Splatter CRF'  'Splatter CRF'};
@@ -25,6 +36,10 @@ theContrastLevels = {[400] [400] [400] [400] ...
     [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] ...
     [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
 wls = SToWls([380 2 201]);
+
+% Make some empty variables
+MelPostRecepContrasts = [];
+SplatterPostRecepContrasts = [];
 
 currDir = pwd;
 Mc = [];
@@ -104,7 +119,7 @@ for d = 1:length(theDataPaths)
     for jj = 1:size(receptorObj.Ts{ii}.T_energyNormalized, 1)
         contrastsFixed(jj) = (T_receptors(jj, :)*(modSpdValMean(:, end)-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
     end
-    postRecepContrastsFixed = [1 1 0 ; 1 -1 0 ; 0 0 1]' \ contrastsFixed';
+    postRecepContrastsFixed(:, d) = [1 1 1 ; 1 -1 0 ; 0 0 1]' \ contrastsFixed';
     
     for ii = 1:NSamples
         T_receptors = receptorObj.Ts{ii}.T_energyNormalized;
@@ -139,8 +154,8 @@ for d = 1:length(theDataPaths)
     %
     %     fig2 = figure;
     %     XAxLims = [-0.1 0.1]; YAxLims = [-0.3 0.3];
-    %     XNominalContrast = 0; YNominalContrast = 0;
-    %     ScatterPlotNoHistogram(postRecepContrastsStochastic(1, :), postRecepContrastsStochastic(3, :), ...
+    %     XNoeeminalContrast = 0; YNominalContrast = 0;
+    %     edi(postRecepContrastsStochastic(1, :), postRecepContrastsStochastic(3, :), ...
     %         'XLim', XAxLims, 'YLim', YAxLims, 'XBinWidth', 0.01, 'YBinWidth', 0.03, ...
     %         'XLabel', 'L+M+S contrast', 'YLabel', 'S contrast', ...
     %         'XRefLines', [XAxLims ; YNominalContrast YNominalContrast], ...
@@ -159,33 +174,72 @@ for d = 1:length(theDataPaths)
     %     saveas(fig2, outFile2, 'png');
     %     close(fig1); close(fig2);
     
-    % Absolute
-    
-    subplot(1, 2, 1);
     if d < 5
-        plot(abs(postRecepContrastsStochastic(1, :)), abs(postRecepContrastsStochastic(2, :)), '.k'); hold on;
+        MelPostRecepContrasts =  [MelPostRecepContrasts postRecepContrastsStochastic];
     else
-        plot(abs(postRecepContrastsStochastic(1, :)), abs(postRecepContrastsStochastic(2, :)), '.r'); hold on;
+        SplatterPostRecepContrasts = [SplatterPostRecepContrasts postRecepContrastsStochastic];
     end
-    xlim([-0.0025 0.1]); xlabel('L+M+S contrast');
-    ylim([-0.0025 0.1]); ylabel('L-M contrast');
-    pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off;
     
-    subplot(1, 2, 2);
-    if d < 5
-        plot(abs(postRecepContrastsStochastic(1, :)), abs(postRecepContrastsStochastic(3, :)), '.k'); hold on;
-    else
-        plot(abs(postRecepContrastsStochastic(1, :)), abs(postRecepContrastsStochastic(3, :)), '.r'); hold on;
-    end
-    xlim([-0.0025 0.1]); xlabel('L+M+S contrast');
-    ylim([-0.0075 0.3]); ylabel('S contrast');
-    pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off;
-    ls
+    
 end
-        set(gcf, 'PaperPosition', [0 0 6 3]);
-        set(gcf, 'PaperSize', [6 3]);
-        set(gcf, 'Color', 'w');
-        set(gcf, 'InvertHardcopy', 'off');
-        saveas(gcf, '~/Desktop/Test.png', 'png');
+
+% Absolute
+MelPostRecepContrasts = abs(MelPostRecepContrasts);
+SplatterPostRecepContrasts = abs(SplatterPostRecepContrasts);
+
+fig1 = figure;
+ScatterplotWithHistogram(MelPostRecepContrasts(1, :), MelPostRecepContrasts(2, :), ...
+    'XBinWidth', 0.005, 'YBinWidth', 0.005, 'XLim', [-0.001 0.1], 'YLim', [-0.001 0.1], ...
+    'XLabel', '|L+M+S contrast|', 'YLabel', '|L-M contrast|', 'Color', [1 0 0 ; 1 0 0], ...
+    'MaxP', 1);
+ScatterplotWithHistogram(SplatterPostRecepContrasts(1, :), SplatterPostRecepContrasts(2, :), ...
+    'XBinWidth', 0.005, 'YBinWidth', 0.005, 'XLim', [-0.001 0.1], 'YLim', [-0.001 0.1], ...
+    'XLabel', '|L+M+S contrast|', 'YLabel', '|L-M contrast|', 'Color', [1 0.5 0 ; 1 0.5 0], ...
+    'MaxP', 1);
+% Add percentile lines
+subplot(2, 2, 1);
+plot([prctile(MelPostRecepContrasts(1, :), 95) prctile(MelPostRecepContrasts(1, :), 95)], [0 1], '--k');
+subplot(2, 2, 4);
+plot([0 1], [prctile(MelPostRecepContrasts(2, :), 95) prctile(MelPostRecepContrasts(2, :), 95)], '--k');
+
+% Add contrast at target
+subplot(2, 2, 3);
+plot(abs(postRecepContrastsFixed(1, 1:4)), abs(postRecepContrastsFixed(2, 1:4)), '+g', 'MarkerSize', 10);
+
+% Save figure
+set(fig1, 'PaperPosition', [0 0 6 6]);
+set(fig1, 'PaperSize', [6 6]);
+set(fig1, 'Color', 'w');
+set(fig1, 'InvertHardcopy', 'off');
+saveas(fig1, outFile1, 'png');
+close(fig1);
+
+% S splatter
+fig2 = figure;
+ScatterplotWithHistogram(MelPostRecepContrasts(1, :), MelPostRecepContrasts(3, :), ...
+    'XBinWidth', 0.005, 'YBinWidth', 0.015, 'XLim', [-0.001 0.1], 'YLim', [-0.003 0.3], ...
+    'XLabel', '|L+M+S contrast|', 'YLabel', '|S-(L+M+S)  contrast|', 'Color', [0 0 1 ; 0 0 1], ...
+    'MaxP', 1);
+ScatterplotWithHistogram(SplatterPostRecepContrasts(1, :), SplatterPostRecepContrasts(3, :), ...
+    'XBinWidth', 0.005, 'YBinWidth', 0.015, 'XLim', [-0.001 0.1], 'YLim', [-0.003 0.3], ...
+    'XLabel', '|L+M+S contrast|', 'YLabel', '|S-(L+M+S) contrast|', 'Color', [1 0.5 0 ; 1 0.5 0], ...
+    'MaxP', 1);
+% Add percentile lines
+subplot(2, 2, 1);
+plot([prctile(MelPostRecepContrasts(1, :), 95) prctile(MelPostRecepContrasts(1, :), 95)], [0 1], '--k');
+subplot(2, 2, 4);
+plot([0 1], [prctile(MelPostRecepContrasts(3, :), 95) prctile(MelPostRecepContrasts(3, :), 95)], '--k');
+
+% Add contrast at target
+subplot(2, 2, 3);
+plot(abs(postRecepContrastsFixed(1, 1:4)), abs(postRecepContrastsFixed(3, 1:4)), '+g', 'MarkerSize', 15);
+
+% Save figure
+set(fig2, 'PaperPosition', [0 0 6 6]);
+set(fig2, 'PaperSize', [6 6]);
+set(fig2, 'Color', 'w');
+set(fig2, 'InvertHardcopy', 'off');
+saveas(fig2, outFile2, 'png');
+close(fig2);
 
 ls
