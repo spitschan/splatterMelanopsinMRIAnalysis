@@ -5,36 +5,31 @@ if ~isdir(outDir)
     mkdir(outDir);
 end
 
+whichDataSet = '400Only';
 % Define the data paths
-theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_asb1/060716/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_aso1/053116/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_gka1/060216/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_mxs1/060916/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_asb1/051016/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_aso1/042916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_gka1/050616/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_mxs1/050916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
-
-theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_asb1/032416/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_aso1/032516/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_gka1/033116/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_mxs1/040616/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_asb1/051016/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_aso1/042916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_gka1/050616/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_mxs1/050916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
-
+switch whichDataSet
+    case 'CRF'
+        theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_asb1/060716/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_aso1/053116/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_gka1/060216/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_mxs1/060916/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_asb1/051016/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_aso1/042916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_gka1/050616/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_mxs1/050916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
+    case '400Only'
+        theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_asb1/032416/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_aso1/032516/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_gka1/033116/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_mxs1/040616/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_asb1/051016/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_aso1/042916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_gka1/050616/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation' ...
+            'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_mxs1/050916/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
+end
 
 % Define some meta data manually
-theStimuli = {'Mel 400%' 'Mel 400%'  'Mel 400%'  'Mel 400%'  ...
-    'Mel CRF'  'Mel CRF'  'Mel CRF'  'Mel CRF' 'Mel CRF' ...
-    'Splatter CRF' 'Splatter CRF' 'Splatter CRF'  'Splatter CRF'};
-theObservers = {'ASB' 'ASO' 'GKA' 'MXS' ...
-    'ASB' 'ASO' 'GKA' 'MXS [1]' 'MXS [2]' ...
-    'ASB' 'ASO' 'GKA' 'MXS'};
-theContrastLevels = {[400] [400] [400] [400] ...
-    [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] [25 50 100 200 400] ...
-    [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
+
 wls = SToWls([380 2 201]);
 
 % Make some empty variables
@@ -44,8 +39,7 @@ SplatterPostRecepContrasts = [];
 currDir = pwd;
 Mc = [];
 for d = 1:length(theDataPaths)
-    outFile1 = fullfile(outDir, [theStimuli{d} '_' theObservers{d} '_LM.png']);
-    outFile2 = fullfile(outDir, [theStimuli{d} '_' theObservers{d} '_S.png']);
+    outFile1 = fullfile(outDir, ['FigureX_PhysiologicalSplatter_' whichDataSet '.pdf']);
     dataPath = theDataPaths{d};
     
     % Find the folders
@@ -104,7 +98,6 @@ for d = 1:length(theDataPaths)
         modSpdValSD(:, kk) = std(modSpdVal{kk}, [], 2);
     end
     
-    
     %% Make the receptor object
     observerAgeInYrs = tmp.cals{1}.describe.cache.REFERENCE_OBSERVER_AGE;
     fractionBleached = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.fractionBleached;
@@ -113,7 +106,6 @@ for d = 1:length(theDataPaths)
     receptorObj = SSTReceptorHuman('obsAgeYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
     NSamples = 1000;
     receptorObj.makeSpectralSensitivitiesStochastic('NSamples', NSamples);
-    
     
     T_receptors = receptorObj.T.T_energyNormalized;
     for jj = 1:size(receptorObj.Ts{ii}.T_energyNormalized, 1)
@@ -152,7 +144,7 @@ for d = 1:length(theDataPaths)
     %     cd(currDir);
     %     saveas(fig1, outFile1, 'png');
     %
-    %     fig2 = figure;
+    %     fig1 = figure;
     %     XAxLims = [-0.1 0.1]; YAxLims = [-0.3 0.3];
     %     XNoeeminalContrast = 0; YNominalContrast = 0;
     %     edi(postRecepContrastsStochastic(1, :), postRecepContrastsStochastic(3, :), ...
@@ -167,12 +159,12 @@ for d = 1:length(theDataPaths)
     %     title([theStimuli{d} '-' theObservers{d}]);
     %
     %     % Save the figure
-    %     set(fig2, 'PaperPosition', [0 0 3 3]);
-    %     set(fig2, 'PaperSize', [3 3]);
-    %     set(fig2, 'Color', 'w');
-    %     set(fig2, 'InvertHardcopy', 'off');
-    %     saveas(fig2, outFile2, 'png');
-    %     close(fig1); close(fig2);
+    %     set(fig1, 'PaperPosition', [0 0 3 3]);
+    %     set(fig1, 'PaperSize', [3 3]);
+    %     set(fig1, 'Color', 'w');
+    %     set(fig1, 'InvertHardcopy', 'off');
+    %     saveas(fig1, outFile2, 'png');
+    %     close(fig1); close(fig1);
     
     if d < 5
         MelPostRecepContrasts =  [MelPostRecepContrasts postRecepContrastsStochastic];
@@ -183,63 +175,45 @@ for d = 1:length(theDataPaths)
     
 end
 
-% Absolute
-%MelPostRecepContrasts = abs(MelPostRecepContrasts);
-%SplatterPostRecepContrasts = abs(SplatterPostRecepContrasts);
-
 fig1 = figure;
+subplot(1, 2, 1);
 ScatterplotWithHistogram(MelPostRecepContrasts(1, :), MelPostRecepContrasts(2, :), ...
     'XBinWidth', 0.005, 'YBinWidth', 0.005, 'XLim', [-0.1 0.1], 'YLim', [-0.1 0.1], ...
     'XLabel', '|L+M+S contrast|', 'YLabel', '|L-M contrast|', 'Color', [1 0 0 ; 1 0 0], ...
-    'MaxP', 1);
+    'MaxP', 1, 'PlotMarginals', false);
 ScatterplotWithHistogram(SplatterPostRecepContrasts(1, :), SplatterPostRecepContrasts(2, :), ...
     'XBinWidth', 0.005, 'YBinWidth', 0.005, 'XLim', [-0.1 0.1], 'YLim', [-0.1 0.1], ...
     'XLabel', '|L+M+S contrast|', 'YLabel', '|L-M contrast|', 'Color', [1 0.5 0 ; 1 0.5 0], ...
-    'MaxP', 1);
-% Add percentile lines
-subplot(2, 2, 1);
-plot([prctile(MelPostRecepContrasts(1, :), 95) prctile(MelPostRecepContrasts(1, :), 95)], [0 1], '--k');
-subplot(2, 2, 4);
-plot([0 1], [prctile(MelPostRecepContrasts(2, :), 95) prctile(MelPostRecepContrasts(2, :), 95)], '--k');
-
+    'MaxP', 1, 'PlotMarginals', false, ...
+    'XRefLines', [0 0; -0.1 0.1], 'YRefLines', [-0.1 0.1; 0 0]);
 % Add contrast at target
-subplot(2, 2, 3);
 plot(postRecepContrastsFixed(1, 1:4), postRecepContrastsFixed(2, 1:4), '+g', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 5:end), postRecepContrastsFixed(2, 5:end), '+k', 'MarkerSize', 10);
 
-% Save figure
-set(fig1, 'PaperPosition', [0 0 6 6]);
-set(fig1, 'PaperSize', [6 6]);
-set(fig1, 'Color', 'w');
-set(fig1, 'InvertHardcopy', 'off');
-saveas(fig1, outFile1, 'png');
-close(fig1);
+plot_error_ellipse([MelPostRecepContrasts(1, :) ; MelPostRecepContrasts(2, :)]')
+
 
 % S splatter
-fig2 = figure;
+subplot(1, 2, 2);
 ScatterplotWithHistogram(MelPostRecepContrasts(1, :), MelPostRecepContrasts(3, :), ...
     'XBinWidth', 0.005, 'YBinWidth', 0.015, 'XLim', [-0.1 0.1], 'YLim', [-0.3 0.3], ...
     'XLabel', '|L+M+S contrast|', 'YLabel', '|S-(L+M+S)  contrast|', 'Color', [0 0 1 ; 0 0 1], ...
-    'MaxP', 1);
+    'MaxP', 1, 'PlotMarginals', false);
 ScatterplotWithHistogram(SplatterPostRecepContrasts(1, :), SplatterPostRecepContrasts(3, :), ...
     'XBinWidth', 0.005, 'YBinWidth', 0.015, 'XLim', [-0.1 0.1], 'YLim', [-0.3 0.3], ...
     'XLabel', '|L+M+S contrast|', 'YLabel', '|S-(L+M+S) contrast|', 'Color', [1 0.5 0 ; 1 0.5 0], ...
-    'MaxP', 1);
-% Add percentile lines
-subplot(2, 2, 1);
-plot([prctile(MelPostRecepContrasts(1, :), 95) prctile(MelPostRecepContrasts(1, :), 95)], [0 1], '--k');
-subplot(2, 2, 4);
-plot([0 1], [prctile(MelPostRecepContrasts(3, :), 95) prctile(MelPostRecepContrasts(3, :), 95)], '--k');
-
+    'MaxP', 1, 'PlotMarginals', false, ...
+    'XRefLines', [0 0; -0.3 0.3], 'YRefLines', [-0.1 0.1; 0 0]);
 % Add contrast at target
-subplot(2, 2, 3);
-plot(abs(postRecepContrastsFixed(1, 1:4)), abs(postRecepContrastsFixed(3, 1:4)), '+g', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 1:4), postRecepContrastsFixed(3, 1:4), '+g', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 5:end), postRecepContrastsFixed(3, 5:end), '+k', 'MarkerSize', 10);
+
+plot_error_ellipse([MelPostRecepContrasts(1, :) ; MelPostRecepContrasts(3, :)]')
 
 % Save figure
-set(fig2, 'PaperPosition', [0 0 6 6]);
-set(fig2, 'PaperSize', [6 6]);
-set(fig2, 'Color', 'w');
-set(fig2, 'InvertHardcopy', 'off');
-saveas(fig2, outFile2, 'png');
-close(fig2);
-
-ls
+set(fig1, 'PaperPosition', [0 0 6 3]);
+set(fig1, 'PaperSize', [6 3]);
+set(fig1, 'Color', 'w');
+set(fig1, 'InvertHardcopy', 'off');
+saveas(fig1, outFile1, 'pdf');
+close(fig1);
