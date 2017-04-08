@@ -5,7 +5,7 @@ if ~isdir(outDir)
     mkdir(outDir);
 end
 
-whichDataSet = '400Only';
+whichDataSet = 'CRF';
 % Define the data paths
 switch whichDataSet
     case 'CRF'
@@ -37,9 +37,11 @@ MelPostRecepContrasts = [];
 SplatterPostRecepContrasts = [];
 
 currDir = pwd;
-Mc = [];
+indDiffParams = [];
+adjIndDiffParams = [];
 for d = 1:length(theDataPaths)
     outFile1 = fullfile(outDir, ['FigureX_PhysiologicalSplatter_' whichDataSet '.pdf']);
+    outFile2 = fullfile(outDir, ['FigureX_PhysiologicalSplatterParam_' whichDataSet '.pdf']);
     dataPath = theDataPaths{d};
     
     % Find the folders
@@ -119,6 +121,8 @@ for d = 1:length(theDataPaths)
             contrastsStochastic(jj, ii) = (T_receptors(jj, :)*(modSpdValMean(:, end)-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
         end
         postRecepContrastsStochastic(:, ii) = [1 1 1 ; 1 -1 0 ; 0 0 1]' \ contrastsStochastic(:, ii);
+        indDiffParams = [indDiffParams receptorObj.Ts{ii}.indDiffParams];
+        adjIndDiffParams = [adjIndDiffParams receptorObj.Ts{ii}.adjIndDiffParams];
     end
     
     %     theRGB = DefaultReceptorColors;
@@ -187,8 +191,15 @@ ScatterplotWithHistogram(SplatterPostRecepContrasts(1, :), SplatterPostRecepCont
     'MaxP', 1, 'PlotMarginals', false, ...
     'XRefLines', [0 0; -0.1 0.1], 'YRefLines', [-0.1 0.1; 0 0]);
 % Add contrast at target
-plot(postRecepContrastsFixed(1, 1:4), postRecepContrastsFixed(2, 1:4), '+g', 'MarkerSize', 10);
-plot(postRecepContrastsFixed(1, 5:end), postRecepContrastsFixed(2, 5:end), '+k', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 1), postRecepContrastsFixed(2, 1), '+g', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 2), postRecepContrastsFixed(2, 2), 'og', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 3), postRecepContrastsFixed(2, 3), 'xg', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 4), postRecepContrastsFixed(2, 4), '*g', 'MarkerSize', 10);
+
+plot(postRecepContrastsFixed(1, 5), postRecepContrastsFixed(2, 5), '+k', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 6), postRecepContrastsFixed(2, 6), 'ok', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 7), postRecepContrastsFixed(2, 7), 'xk', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 8), postRecepContrastsFixed(2, 8), '*k', 'MarkerSize', 10);
 
 plot_error_ellipse([MelPostRecepContrasts(1, :) ; MelPostRecepContrasts(2, :)]')
 
@@ -205,8 +216,15 @@ ScatterplotWithHistogram(SplatterPostRecepContrasts(1, :), SplatterPostRecepCont
     'MaxP', 1, 'PlotMarginals', false, ...
     'XRefLines', [0 0; -0.3 0.3], 'YRefLines', [-0.1 0.1; 0 0]);
 % Add contrast at target
-plot(postRecepContrastsFixed(1, 1:4), postRecepContrastsFixed(3, 1:4), '+g', 'MarkerSize', 10);
-plot(postRecepContrastsFixed(1, 5:end), postRecepContrastsFixed(3, 5:end), '+k', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 1), postRecepContrastsFixed(3, 1), '+g', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 2), postRecepContrastsFixed(3, 2), 'og', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 3), postRecepContrastsFixed(3, 3), 'xg', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 4), postRecepContrastsFixed(3, 4), '*g', 'MarkerSize', 10);
+
+plot(postRecepContrastsFixed(1, 5), postRecepContrastsFixed(3, 5), '+k', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 6), postRecepContrastsFixed(3, 6), 'ok', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 7), postRecepContrastsFixed(3, 7), 'xk', 'MarkerSize', 10);
+plot(postRecepContrastsFixed(1, 8), postRecepContrastsFixed(3, 8), '*k', 'MarkerSize', 10);
 
 plot_error_ellipse([MelPostRecepContrasts(1, :) ; MelPostRecepContrasts(3, :)]')
 
@@ -217,3 +235,222 @@ set(fig1, 'Color', 'w');
 set(fig1, 'InvertHardcopy', 'off');
 saveas(fig1, outFile1, 'pdf');
 close(fig1);
+
+%% "Parametric" analysis
+fig2 = figure;
+% Lens
+subplot(3, 8, 1);
+plot([indDiffParams(1:4000).dlens], MelPostRecepContrasts(1, :), '.k'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+title('Lens');
+
+subplot(3, 8, 9);
+plot([indDiffParams(1:4000).dlens], MelPostRecepContrasts(2, :), '.r'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+
+subplot(3, 8, 17);
+plot([indDiffParams(1:4000).dlens], MelPostRecepContrasts(3, :), '.b'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.35 0.35]);
+plot([0 0], [-0.35 0.35], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast'); xlabel('Deviation [%]');
+
+% Macula
+subplot(3, 8, 2);
+plot([indDiffParams(1:4000).dmac], MelPostRecepContrasts(1, :), '.k'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+title('Macula');
+
+subplot(3, 8, 10);
+plot([indDiffParams(1:4000).dmac], MelPostRecepContrasts(2, :), '.r'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+
+subplot(3, 8, 18);
+plot([indDiffParams(1:4000).dmac], MelPostRecepContrasts(3, :), '.b'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.35 0.35]);
+plot([0 0], [-0.35 0.35], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast'); xlabel('Deviation [%]');
+
+% Photopigment density
+for ii = 1:4000
+    LDensity(ii) = indDiffParams(ii).dphotopigment(1);
+    MDensity(ii) = indDiffParams(ii).dphotopigment(2);
+    SDensity(ii) = indDiffParams(ii).dphotopigment(3);
+end
+% L cone
+subplot(3, 8, 3);
+plot(LDensity, MelPostRecepContrasts(1, :), '.k'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+title('L cone density');
+
+subplot(3, 8, 11);
+plot(LDensity, MelPostRecepContrasts(2, :), '.r'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+
+subplot(3, 8, 19);
+plot(LDensity, MelPostRecepContrasts(3, :), '.b'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.35 0.35]);
+plot([0 0], [-0.35 0.35], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast'); xlabel('Deviation [%]');
+
+% M cone
+subplot(3, 8, 4);
+plot(MDensity, MelPostRecepContrasts(1, :), '.k'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+title('M cone density');
+
+subplot(3, 8, 12);
+plot(MDensity, MelPostRecepContrasts(2, :), '.r'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+
+subplot(3, 8, 20);
+plot(MDensity, MelPostRecepContrasts(3, :), '.b'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.35 0.35]);
+plot([0 0], [-0.35 0.35], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast'); xlabel('Deviation [%]');
+
+% S cone
+subplot(3, 8, 5);
+plot(SDensity, MelPostRecepContrasts(1, :), '.k'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+title('S cone density');
+
+subplot(3, 8, 13);
+plot(SDensity, MelPostRecepContrasts(2, :), '.r'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+
+subplot(3, 8, 21);
+plot(SDensity, MelPostRecepContrasts(3, :), '.b'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.35 0.35]);
+plot([0 0], [-0.35 0.35], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast'); xlabel('Deviation [%]');
+
+% Lambda-max shifts
+for ii = 1:4000
+    LShift(ii) = indDiffParams(ii).lambdaMaxShift(1);
+    MShift(ii) = indDiffParams(ii).lambdaMaxShift(2);
+    SShift(ii) = indDiffParams(ii).lambdaMaxShift(3);
+end
+% L cone
+subplot(3, 8, 6);
+plot(LShift, MelPostRecepContrasts(1, :), '.k'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+xlim([-10 10]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+title('L cone shift');
+
+subplot(3, 8, 14);
+plot(LShift, MelPostRecepContrasts(2, :), '.r'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+xlim([-10 10]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+
+subplot(3, 8, 22);
+plot(LShift, MelPostRecepContrasts(3, :), '.b'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.35 0.35]);
+xlim([-10 10]);
+plot([0 0], [-0.35 0.35], '-k');
+
+% M cone
+subplot(3, 8, 7);
+plot(MShift, MelPostRecepContrasts(1, :), '.k'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+xlim([-10 10]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+title('M cone shift');
+
+subplot(3, 8, 15);
+plot(MShift, MelPostRecepContrasts(2, :), '.r'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+xlim([-10 10]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+
+subplot(3, 8, 23);
+plot(MShift, MelPostRecepContrasts(3, :), '.b'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.35 0.35]);
+xlim([-10 10]);
+plot([0 0], [-0.35 0.35], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast'); xlabel('Deviation [nm]');
+
+% S cone
+subplot(3, 8, 8);
+plot(SShift, MelPostRecepContrasts(1, :), '.k'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+xlim([-10 10]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+title('S cone shift');
+
+subplot(3, 8, 16);
+plot(SShift, MelPostRecepContrasts(2, :), '.r'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.1 0.1]);
+xlim([-10 10]);
+plot([0 0], [-0.1 0.1], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast');
+
+subplot(3, 8, 24);
+plot(SShift, MelPostRecepContrasts(3, :), '.b'); hold on;
+pbaspect([1 1 1]); set(gca, 'TickDir', 'out'); box off; ylim([-0.35 0.35]);
+xlim([-10 10]);
+plot([0 0], [-0.35 0.35], '-k');
+plot([-100 100], [0 0], '-k');
+ylabel('Contrast'); xlabel('Deviation [nm]');
+
+%% Save figure
+set(fig2, 'PaperPosition', [0 0 15 6]);
+set(fig2, 'PaperSize', [15 6]);
+set(fig2, 'Color', 'w');
+set(fig2, 'InvertHardcopy', 'off');
+saveas(fig2, outFile2, 'pdf');
+
+%% Do linear regression
+for ii = 1:3
+    x = [[indDiffParams(1:4000).dlens]' [indDiffParams(1:4000).dmac]' LDensity' MDensity' SDensity' LShift' MShift' SShift'];
+    y = MelPostRecepContrasts(ii, :);
+    fitlm(x, y')
+end
