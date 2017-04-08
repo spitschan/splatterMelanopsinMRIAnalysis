@@ -108,7 +108,7 @@ for d = 1:length(theDataPaths)
     receptorObj.makeSpectralSensitivitiesStochastic('NSamples', NSamples);
     
     T_receptors = receptorObj.T.T_energyNormalized;
-    for jj = 1:size(receptorObj.Ts{ii}.T_energyNormalized, 1)
+    for jj = 1:size(receptorObj.Ts{1}.T_energyNormalized, 1)
         contrastsFixed(jj) = (T_receptors(jj, :)*(modSpdValMean(:, end)-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
     end
     postRecepContrastsFixed(:, d) = [1 1 1 ; 1 -1 0 ; 0 0 1]' \ contrastsFixed';
