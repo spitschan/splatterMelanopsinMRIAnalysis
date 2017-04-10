@@ -5,7 +5,7 @@ if ~isdir(outDir)
     mkdir(outDir);
 end
 
-whichDataSet = '400Only';
+whichDataSet = 'CRF';
 % Define the data paths
 switch whichDataSet
     case 'CRF'
@@ -255,6 +255,9 @@ plot([0 0], [0 yLim], ':k');
 plot([MeanPostreceptorContrastsFixedSplatter(1) MeanPostreceptorContrastsFixedSplatter(1)]*0.5, [0 yLim], '-k');
 plot([MeanPostreceptorContrastsFixedSplatter(1) MeanPostreceptorContrastsFixedSplatter(1)], [0 yLim], '-b');
 plot([respScalar*MeanPostreceptorContrastsFixedSplatter(1) respScalar*MeanPostreceptorContrastsFixedSplatter(1)], [0 yLim], '-r');
+plot([-MeanPostreceptorContrastsFixedSplatter(1) -MeanPostreceptorContrastsFixedSplatter(1)]*0.5, [0 yLim], '-k');
+plot([-MeanPostreceptorContrastsFixedSplatter(1) -MeanPostreceptorContrastsFixedSplatter(1)], [0 yLim], '-b');
+plot([-respScalar*MeanPostreceptorContrastsFixedSplatter(1) -respScalar*MeanPostreceptorContrastsFixedSplatter(1)], [0 yLim], '-r');
 pbaspect([1 1 1]); box off; set(gca, 'TickDir', 'out');
 title('L+M+S');
 
@@ -266,6 +269,9 @@ plot([0 0], [0 yLim], ':k');
 plot([MeanPostreceptorContrastsFixedSplatter(2) MeanPostreceptorContrastsFixedSplatter(2)]*0.5, [0 yLim], '-k');
 plot([MeanPostreceptorContrastsFixedSplatter(2) MeanPostreceptorContrastsFixedSplatter(2)], [0 yLim], '-b');
 plot([respScalar*MeanPostreceptorContrastsFixedSplatter(2) respScalar*MeanPostreceptorContrastsFixedSplatter(2)], [0 yLim], '-r');
+plot([-MeanPostreceptorContrastsFixedSplatter(2) -MeanPostreceptorContrastsFixedSplatter(2)]*0.5, [0 yLim], '-k');
+plot([-MeanPostreceptorContrastsFixedSplatter(2) -MeanPostreceptorContrastsFixedSplatter(2)], [0 yLim], '-b');
+plot([-respScalar*MeanPostreceptorContrastsFixedSplatter(2) -respScalar*MeanPostreceptorContrastsFixedSplatter(2)], [0 yLim], '-r');
 pbaspect([1 1 1]); box off; set(gca, 'TickDir', 'out');
 title('L-M');
 
@@ -277,6 +283,9 @@ plot([0 0], [0 yLim], ':k');
 plot([MeanPostreceptorContrastsFixedSplatter(3) MeanPostreceptorContrastsFixedSplatter(3)]*0.5, [0 yLim], '-k');
 plot([MeanPostreceptorContrastsFixedSplatter(3) MeanPostreceptorContrastsFixedSplatter(3)], [0 yLim], '-b');
 plot([respScalar*MeanPostreceptorContrastsFixedSplatter(3) respScalar*MeanPostreceptorContrastsFixedSplatter(3)], [0 yLim], '-r');
+plot([-MeanPostreceptorContrastsFixedSplatter(3) -MeanPostreceptorContrastsFixedSplatter(3)]*0.5, [0 yLim], '-k');
+plot([-MeanPostreceptorContrastsFixedSplatter(3) -MeanPostreceptorContrastsFixedSplatter(3)], [0 yLim], '-b');
+plot([-respScalar*MeanPostreceptorContrastsFixedSplatter(3) -respScalar*MeanPostreceptorContrastsFixedSplatter(3)], [0 yLim], '-r');
 pbaspect([1 1 1]); box off; set(gca, 'TickDir', 'out');
 title('S-[L+M+S]');
 
