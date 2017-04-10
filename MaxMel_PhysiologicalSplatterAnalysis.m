@@ -5,7 +5,7 @@ if ~isdir(outDir)
     mkdir(outDir);
 end
 
-whichDataSet = 'CRF';
+whichDataSet = '400Only';
 % Define the data paths
 switch whichDataSet
     case 'CRF'
@@ -225,15 +225,12 @@ plot(respScalar*MeanPostreceptorContrastsFixedSplatter(1), respScalar*MeanPostre
 plot(X, Y, '-k');
 
 fprintf('>> x4.11 splatter point:\n')
-fprintf('\t<strong>LMS</strong>: \t\t%f, inverse percentile: %f\n', respScalar*MeanPostreceptorContrastsFixedSplatter(1), ...
-    invprctile(MelPostRecepContrasts(1, :), ...
-    respScalar*MeanPostreceptorContrastsFixedSplatter(1)));
-fprintf('\t<strong>L-M</strong>: \t\t%f, inverse percentile: %f\n', respScalar*MeanPostreceptorContrastsFixedSplatter(2), ...
-    invprctile(MelPostRecepContrasts(2, :), ...
-    respScalar*MeanPostreceptorContrastsFixedSplatter(2)));
-fprintf('\t<strong>S-[LMS</strong>]: \t%f, inverse percentile: %f\n', respScalar*MeanPostreceptorContrastsFixedSplatter(3), ...
-    invprctile(MelPostRecepContrasts(3, :), ...
-    respScalar*MeanPostreceptorContrastsFixedSplatter(3)));
+fprintf('\t<strong>LMS</strong>: \t\t%f, inverse percentile (two tails): %f\n', respScalar*MeanPostreceptorContrastsFixedSplatter(1), ...
+    100-invprctile(MelPostRecepContrasts(1, :), respScalar*MeanPostreceptorContrastsFixedSplatter(1))+invprctile(MelPostRecepContrasts(1, :), -respScalar*MeanPostreceptorContrastsFixedSplatter(1)));
+fprintf('\t<strong>L-M</strong>: \t\t%f, inverse percentile (two tails): %f\n', respScalar*MeanPostreceptorContrastsFixedSplatter(2), ...
+    100-invprctile(MelPostRecepContrasts(2, :), respScalar*MeanPostreceptorContrastsFixedSplatter(2))+invprctile(MelPostRecepContrasts(2, :), -respScalar*MeanPostreceptorContrastsFixedSplatter(2)));
+fprintf('\t<strong>S-[LMS</strong>]: \t%f, inverse percentile (two tails): %f\n', respScalar*MeanPostreceptorContrastsFixedSplatter(3), ...
+    invprctile(MelPostRecepContrasts(3, :), respScalar*MeanPostreceptorContrastsFixedSplatter(3))+100-invprctile(MelPostRecepContrasts(3, :), -respScalar*MeanPostreceptorContrastsFixedSplatter(3)));
 
 % Save figure
 set(fig1, 'PaperPosition', [0 0 8 3]);
