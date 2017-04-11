@@ -118,7 +118,6 @@ for d = 1:length(theDataPaths)
         end
     end
     
-    
     % Gather all the spectra
     theHeader = [theObservers{d} ', ' theStimuli{d}];
     theString = sprintf('Wavelength [nm],Background nominal [%i yrs],', theObserverAge(d));
