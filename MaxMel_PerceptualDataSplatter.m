@@ -78,8 +78,16 @@ theLMSData = {'022117/Cache-LMSDirectedSuperMaxLMS_MELA_0090_022117' ...
 warning('off', 'MATLAB:load:cannotInstantiateLoadedVariable');
 warning('off', 'MATLAB:dispatcher:UnresolvedFunctionHandle');
 warning('off', 'MATLAB:class:EnumerableClassNotFound');
+
+% Set up the wl vector
+wls = SToWls([380 2 201]);
+header = 'Wavelength [nm],Background (Mel),Modulation (Mel),Background (LMS),Modulation (LMS)';
+
 % Load the files
 for d = 1:NSubjects
+    outTable = 
+    
+    M = [wls];
     % Clear data
     clear bgSpdVal;
     clear modSpdVal;
@@ -140,6 +148,8 @@ for d = 1:NSubjects
     end
     postRecepContrastsFixedMel(:, d) = [1 1 1 ; 1 -1 0 ; 0 0 1]' \ contrastsFixed';
     
+    M = [M bgSpdVal modSpdVal];
+    
     % Clear data
     clear bgSpdVal;
     clear modSpdVal;
@@ -194,6 +204,8 @@ for d = 1:NSubjects
     end
     bgSpdValMean = median(bgSpdVal, 2);
     modSpdValMean = median(modSpdVal, 2);
+    
+    M = [M bgSpdVal modSpdVal];
     
     T_receptors = receptorObj.T.T_energyNormalized;
     for jj = 1:3
