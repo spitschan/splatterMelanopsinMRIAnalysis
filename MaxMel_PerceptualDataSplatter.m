@@ -1,9 +1,13 @@
 % Define the paths
 dropboxBasePath = '/Users/mspits/Dropbox (Aguirre-Brainard Lab)/MELA_materials/MaxMelPulsePsychophysics';
 outDir = fullfile(pwd, 'figures');
-outTable = fullfile(pwd, 'tables', 'perceptualdata');
+outTableDir = fullfile(pwd, 'tables', 'perceptualdata');
 if ~isdir(outDir)
     mkdir(outDir);
+end
+
+if ~isdir(outTableDir)
+    mkdir(outTableDir);
 end
 
 % Define the # of subjects
@@ -86,7 +90,7 @@ header = 'Wavelength [nm],Background (Mel),Modulation (Mel),Background (LMS),Mod
 
 % Load the files
 for d = 1:NSubjects
-    outTable = fullfile(outTable, ['Spectra_sub' num2str(d, '%03g')]);
+    outFile = fullfile(outTableDir, ['Spectra_sub' num2str(d, '%03g')]);
     fid = fopen(outFile, 'w');
     fprintf(fid, header);
     fclose(fid);
@@ -218,7 +222,7 @@ for d = 1:NSubjects
     postRecepContrastsFixedLMS(:, d) = [1 1 1 ; 1 -1 0 ; 0 0 1]' \ contrastsFixed';
     
     % Write the table
-    dlmwrite(outTable, M, '-append');
+    dlmwrite(outFile, M, '-append');
 end
 
 fig1 = figure;
