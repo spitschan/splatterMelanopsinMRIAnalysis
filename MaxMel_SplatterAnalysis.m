@@ -107,7 +107,7 @@ for d = 1:length(theDataPaths)
             T_xyz = SplineCmf(S_xyz1931,683*T_xyz1931,WlsToS(wls));
             
             % Get the background spectrum
-            bgSpd = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum; hold on;
+            bgSpd = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum;
             
             % Calculate luminance and chromaticy
             luminance(f) = T_xyz(2, :)*bgSpd;
@@ -149,19 +149,19 @@ for d = 1:length(theDataPaths)
         end
     end
     % Take the average
-    lumMean = mean(luminance);
+    lumMean = median(luminance);
     lumSD = std(luminance);
-    chromMean = mean(chromaticity, 2);
+    chromMean = median(chromaticity, 2);
     chromSD = std(chromaticity, [], 2);
-    scotTdMean = mean(irradianceScotTrolands);
+    scotTdMean = median(irradianceScotTrolands);
     scotTdSD = std(irradianceScotTrolands);
-    photTdMean = mean(irradiancePhotTrolands);
+    photTdMean = median(irradiancePhotTrolands);
     photTdSD = std(irradiancePhotTrolands);
     
     for ii = 1:NContrastLevels
-        contrastsMean(:, ii) = mean(contrasts{ii}, 2);
+        contrastsMean(:, ii) = median(contrasts{ii}, 2);
         contrastsSD(:, ii) = std(contrasts{ii}, [], 2);
-        postRecepContrastsMean(:, ii) = mean(postRecepContrasts{ii}, 2);
+        postRecepContrastsMean(:, ii) = median(postRecepContrasts{ii}, 2);
         postRecepContrastsSD(:, ii) = std(postRecepContrasts{ii}, [], 2);
     end
     
