@@ -269,3 +269,8 @@ close(fig2);
 warning('on', 'MATLAB:load:cannotInstantiateLoadedVariable');
 warning('on', 'MATLAB:dispatcher:UnresolvedFunctionHandle');
 warning('on', 'MATLAB:class:EnumerableClassNotFound');
+
+%% See if there's a correlation between color rating and L-M contrast
+for ii = 1:NSubjects
+   colorRatingLMS(ii) = table2array(foldedDataTable{ii}(12, 4));
+end
