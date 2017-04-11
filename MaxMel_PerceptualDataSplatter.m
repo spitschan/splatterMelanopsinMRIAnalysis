@@ -156,7 +156,7 @@ for d = 1:NSubjects
     end
     postRecepContrastsFixedMel(:, d) = [1 1 1 ; 1 -1 0 ; 0 0 1]' \ contrastsFixed';
     
-    M = [M bgSpdVal modSpdVal];
+    M = [M bgSpdValMean modSpdValMean];
     
     % Clear data
     clear bgSpdVal;
@@ -213,7 +213,7 @@ for d = 1:NSubjects
     bgSpdValMean = median(bgSpdVal, 2);
     modSpdValMean = median(modSpdVal, 2);
     
-    M = [M bgSpdVal modSpdVal];
+    M = [M bgSpdValMean modSpdValMean];
     
     T_receptors = receptorObj.T.T_energyNormalized;
     for jj = 1:3
