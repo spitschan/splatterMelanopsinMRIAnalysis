@@ -10,6 +10,8 @@ if ~isdir(outTableDir)
     mkdir(outTableDir);
 end
 
+outFileSplatter = fullfile(pwd, 'tables', 'TableX_SplatterData.csv');
+
 % Define the # of subjects
 NSubjects = 20;
 
@@ -79,20 +81,32 @@ theLMSData = {'040517/Cache-LMSDirectedSuperMaxLMS_MELA_0074_040517' ...
     '021017/Cache-LMSDirectedSuperMaxLMS_MELA_0081_021017'};
     %' ...
 
-
+% Turn off some warnings
 warning('off', 'MATLAB:load:cannotInstantiateLoadedVariable');
 warning('off', 'MATLAB:dispatcher:UnresolvedFunctionHandle');
 warning('off', 'MATLAB:class:EnumerableClassNotFound');
 
 % Set up the wl vector
 wls = SToWls([380 2 201]);
-header = 'Wavelength [nm],Background (Mel),Modulation (Mel),Background (LMS),Modulation (LMS)\n';
+
+% Calculate luminance and chromaticity
+% Load the CIE functions
+load T_xyz1931
+T_xyz = SplineCmf(S_xyz1931,683*T_xyz1931,WlsToS(wls));
+
+% Set up the header
+headerSpectra = 'Wavelength [nm],Background (Mel),Modulation (Mel),Background (LMS),Modulation (LMS)\n';
+
+% Save splatter table
+fid = fopen(outFileSplatter, 'w');
+fprintf(fid, 'Stimulus,Observer,Observer age,Nominal contrast [%s],Luminance [cd/m2],Irradiance [sc td],[log10 sc td],Irradiance [ph td],[log10 ph td],x chromaticity,y chromaticity,L contrast [%s],M contrast [%s],S contrast [%s],Melanopsin contrast [%s],Rod contrast [%s],LMS contrast [%s],L-M contrast [%s]\n', '%', '%', '%', '%', '%', '%', '%', '%');
+fclose(fid);
 
 % Load the files
 for d = 1:NSubjects
     outFile = fullfile(outTableDir, ['Spectra_sub' num2str(d, '%03g') '.csv']);
     fid = fopen(outFile, 'w');
-    fprintf(fid, header);
+    fprintf(fid, headerSpectra);
     fclose(fid);
     
     M = [wls];
@@ -144,7 +158,6 @@ for d = 1:NSubjects
             pupilDiameterMm = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.pupilDiameterMm;
             fieldSizeDegrees = 64;
             receptorObj = SSTReceptorHuman('obsAgeInYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
-            
         end
     end
     bgSpdValMean = median(bgSpdVal, 2);
@@ -158,9 +171,25 @@ for d = 1:NSubjects
     
     M = [M bgSpdValMean modSpdValMean];
     
+    % Calculate luminance and chromaticy
+    luminance = T_xyz(2, :)*bgSpdValMean;
+    chromaticity = (T_xyz([1 2], :)*bgSpdValMean)/sum((T_xyz*bgSpdValMean));
+    
+    % Calculate irradiance
+    pupilAreaMm2 = pi*((pupilDiameterMm/2)^2);
+    eyeLengthMm = 17;
+    degPerMm = RetinalMMToDegrees(1,eyeLengthMm);
+    irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpd,S,pupilAreaMm2,eyeLengthMm);
+    irradianceScotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, S, 'Scotopic', [], num2str(eyeLengthMm));
+    irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, S, 'Photopic', [], num2str(eyeLengthMm));
+
+    fprintf('%s,%s,%i%,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'Mel', observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
+        irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), contrastsFixed(1), contrastsFixed(2), contrastsFixed(3), contrastsFixed(4), contrastsFixed(5), postRecepContrastsFixedMel(1, d), postRecepContrastsFixedMel(2, d));
+    
     % Clear data
     clear bgSpdVal;
     clear modSpdVal;
+    
     
     % Load the LMS data first
     dataPath = theLMSData{d};
@@ -223,6 +252,10 @@ for d = 1:NSubjects
     
     % Write the table
     dlmwrite(outFile, M, '-append');
+    
+    % Calculate the splatter
+    
+    
 end
 
 fig1 = figure;
