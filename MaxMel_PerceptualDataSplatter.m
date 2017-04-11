@@ -10,7 +10,7 @@ if ~isdir(outTableDir)
     mkdir(outTableDir);
 end
 
-outFileSplatter = fullfile(pwd, 'tables', 'TableX_SplatterData.csv');
+outFileSplatter = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualData.csv');
 
 % Define the # of subjects
 NSubjects = 20;
@@ -164,10 +164,10 @@ for d = 1:NSubjects
     modSpdValMean = median(modSpdVal, 2);
     
     T_receptors = receptorObj.T.T_energyNormalized;
-    for jj = 1:3
+    for jj = 1:5
         contrastsFixed(jj) = (T_receptors(jj, :)*(modSpdValMean(:, end)-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
     end
-    postRecepContrastsFixedMel(:, d) = [1 1 1 ; 1 -1 0 ; 0 0 1]' \ contrastsFixed';
+    postRecepContrastsFixedMel(:, d) = [1 1 1 0 0; 1 -1 0 0 0; 0 0 1 0 0]' \ contrastsFixed';
     
     M = [M bgSpdValMean modSpdValMean];
     
@@ -179,17 +179,18 @@ for d = 1:NSubjects
     pupilAreaMm2 = pi*((pupilDiameterMm/2)^2);
     eyeLengthMm = 17;
     degPerMm = RetinalMMToDegrees(1,eyeLengthMm);
-    irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpd,S,pupilAreaMm2,eyeLengthMm);
-    irradianceScotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, S, 'Scotopic', [], num2str(eyeLengthMm));
-    irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, S, 'Photopic', [], num2str(eyeLengthMm));
+    irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpdValMean, WlsToS(wls),pupilAreaMm2,eyeLengthMm);
+    irradianceScotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Scotopic', [], num2str(eyeLengthMm));
+    irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Photopic', [], num2str(eyeLengthMm));
 
-    fprintf('%s,%s,%i%,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'Mel', observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
-        irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), contrastsFixed(1), contrastsFixed(2), contrastsFixed(3), contrastsFixed(4), contrastsFixed(5), postRecepContrastsFixedMel(1, d), postRecepContrastsFixedMel(2, d));
+    fid = fopen(outFileSplatter, 'a');
+    fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'Mel', ['sub' num2str(d, '%03g')], observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
+        irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d));
+    fclose(fid);
     
     % Clear data
     clear bgSpdVal;
     clear modSpdVal;
-    
     
     % Load the LMS data first
     dataPath = theLMSData{d};
@@ -245,17 +246,30 @@ for d = 1:NSubjects
     M = [M bgSpdValMean modSpdValMean];
     
     T_receptors = receptorObj.T.T_energyNormalized;
-    for jj = 1:3
+    for jj = 1:5
         contrastsFixed(jj) = (T_receptors(jj, :)*(modSpdValMean(:, end)-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
     end
-    postRecepContrastsFixedLMS(:, d) = [1 1 1 ; 1 -1 0 ; 0 0 1]' \ contrastsFixed';
+    postRecepContrastsFixedLMS(:, d) = [1 1 1 0 0; 1 -1 0 0 0; 0 0 1 0 0]' \ contrastsFixed';
+    
+        % Calculate luminance and chromaticy
+    luminance = T_xyz(2, :)*bgSpdValMean;
+    chromaticity = (T_xyz([1 2], :)*bgSpdValMean)/sum((T_xyz*bgSpdValMean));
+    
+    % Calculate irradiance
+    pupilAreaMm2 = pi*((pupilDiameterMm/2)^2);
+    eyeLengthMm = 17;
+    degPerMm = RetinalMMToDegrees(1,eyeLengthMm);
+    irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpdValMean, WlsToS(wls),pupilAreaMm2,eyeLengthMm);
+    irradianceScotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Scotopic', [], num2str(eyeLengthMm));
+    irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Photopic', [], num2str(eyeLengthMm));
+
+    fid = fopen(outFileSplatter, 'a');
+    fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'LMS', ['sub' num2str(d, '%03g')], observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
+        irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d));
+    fclose(fid);
     
     % Write the table
     dlmwrite(outFile, M, '-append');
-    
-    % Calculate the splatter
-    
-    
 end
 
 fig1 = figure;
