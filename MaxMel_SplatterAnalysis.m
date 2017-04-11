@@ -122,7 +122,7 @@ for d = 1:length(theDataPaths)
             irradiancePhotTrolands(f) = RetIrradianceToTrolands(irradianceWattsPerUm2, S, 'Photopic', [], num2str(eyeLengthMm));
             
             % Set up the receptor object
-            receptorObj = SSTReceptorHuman('obsAgeYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
+            receptorObj = SSTReceptorHuman('obsAgeInYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
             T_rec = receptorObj.T.T_energyNormalized;
             T_val = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.T_receptors;
             
