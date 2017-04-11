@@ -86,11 +86,11 @@ warning('off', 'MATLAB:class:EnumerableClassNotFound');
 
 % Set up the wl vector
 wls = SToWls([380 2 201]);
-header = 'Wavelength [nm],Background (Mel),Modulation (Mel),Background (LMS),Modulation (LMS)';
+header = 'Wavelength [nm],Background (Mel),Modulation (Mel),Background (LMS),Modulation (LMS)\n';
 
 % Load the files
 for d = 1:NSubjects
-    outFile = fullfile(outTableDir, ['Spectra_sub' num2str(d, '%03g')]);
+    outFile = fullfile(outTableDir, ['Spectra_sub' num2str(d, '%03g') '.csv']);
     fid = fopen(outFile, 'w');
     fprintf(fid, header);
     fclose(fid);
