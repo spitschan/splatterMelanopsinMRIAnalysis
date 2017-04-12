@@ -11,6 +11,13 @@ if ~isdir(outTableDir)
 end
 
 outFileSplatter = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualData.csv');
+outFileIndividualSplatterLMS_LMSContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_LMS_LMSContrast.csv');
+outFileIndividualSplatterLMS_LMinusMContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_LMS_LMinusMContrast.csv');
+outFileIndividualSplatterLMS_SMinusLMSContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_LMS_SMinusLMSContrast.csv');
+
+outFileIndividualSplatterMel_LMSContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_Mel_LMSContrast.csv');
+outFileIndividualSplatterMel_LMinusMContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_Mel_LMinusMContrast.csv');
+outFileIndividualSplatterMel_SMinusLMSContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_Mel_SMinusLMSContrast.csv');
 
 % Define the # of subjects
 NSubjects = 20;
@@ -37,7 +44,7 @@ subjectIDs={'MELA_0074',...
     'MELA_0081',...
     };
 [~, s] = sort(subjectIDs)
-subjectIDs = subjectIDs{s};
+subjectIDs = {subjectIDs{s}};
 
 theMelData = {'040517/Cache-MelanopsinDirectedSuperMaxMel_MELA_0074_040517' ...
     '040417/Cache-MelanopsinDirectedSuperMaxMel_MELA_0087_040417' ...
@@ -60,7 +67,7 @@ theMelData = {'040517/Cache-MelanopsinDirectedSuperMaxMel_MELA_0074_040517' ...
     '020817/Cache-MelanopsinDirectedSuperMaxMel_MELA_0077_020817' ...
     '021017/Cache-MelanopsinDirectedSuperMaxMel_MELA_0081_021017'};
 %' ...
-theMelData = theMelData{s};
+theMelData = {theMelData{s}};
 
 theLMSData = {'040517/Cache-LMSDirectedSuperMaxLMS_MELA_0074_040517' ...
     '040417/Cache-LMSDirectedSuperMaxLMS_MELA_0087_040417' ...
@@ -83,7 +90,7 @@ theLMSData = {'040517/Cache-LMSDirectedSuperMaxLMS_MELA_0074_040517' ...
     '020817/Cache-LMSDirectedSuperMaxLMS_MELA_0077_020817' ...
     '021017/Cache-LMSDirectedSuperMaxLMS_MELA_0081_021017'};
 %' ...
-theLMSData = theLMSData{s};
+theLMSData = {theLMSData{s}};
 
 % Turn off some warnings
 warning('off', 'MATLAB:load:cannotInstantiateLoadedVariable');
@@ -117,6 +124,8 @@ for d = 1:NSubjects
     % Clear data
     clear bgSpdVal;
     clear modSpdVal;
+    clear tmp1;
+    clear tmp2;
     
     % Load the mel data first
     dataPath = theMelData{d};
@@ -152,18 +161,33 @@ for d = 1:NSubjects
             % Load the MAT file
             tmp = load(theMATFile.name);
             
-            % Get the background spectrum
-            bgSpdVal(:, f) = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum;
-            modSpdVal(:, f) = tmp.cals{1}.modulationMaxMeas.meas.pr650.spectrum;
-            
             % Make the receptor object
             observerAgeInYrs = tmp.cals{1}.describe.cache.OBSERVER_AGE;
             fractionBleached = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.fractionBleached;
             pupilDiameterMm = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.pupilDiameterMm;
-            fieldSizeDegrees = 64;
+            fieldSizeDegrees = 27.5;
             receptorObj = SSTReceptorHuman('verbosity', 'none', 'obsAgeInYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
+            
+            
+            % Get the background spectrum
+            bgSpdVal(:, f) = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum;
+            modSpdVal(:, f) = tmp.cals{1}.modulationMaxMeas.meas.pr650.spectrum;
+            
+            % Calc contrast per validation
+            T_receptors = receptorObj.T.T_energyNormalized;
+            for jj = 1:5
+                tmp1(jj) = (T_receptors(jj, :)*(modSpdVal(:, f)-bgSpdVal(:, f)))./(T_receptors(jj, :)*bgSpdVal(:, f));
+            end
+            tmp2(:, f) = [1 1 1 0 0; 1 -1 0 0 0; 0 0 1 0 0]' \ tmp1';
         end
     end
+    
+    % Save out individual splatter
+    dlmwrite(outFileIndividualSplatterMel_LMSContrast, [str2double(subjectIDs{d}(6:9)) tmp2(1, :)], '-append');
+    dlmwrite(outFileIndividualSplatterMel_LMinusMContrast, [str2double(subjectIDs{d}(6:9)) tmp2(2, :)], '-append');
+    dlmwrite(outFileIndividualSplatterMel_SMinusLMSContrast, [str2double(subjectIDs{d}(6:9)) tmp2(3, :)], '-append');
+    
+    
     bgSpdValMean = median(bgSpdVal, 2);
     modSpdValMean = median(modSpdVal, 2);
     
@@ -195,6 +219,8 @@ for d = 1:NSubjects
     % Clear data
     clear bgSpdVal;
     clear modSpdVal;
+    clear tmp1;
+    clear tmp2;
     
     % Load the LMS data first
     dataPath = theLMSData{d};
@@ -239,11 +265,25 @@ for d = 1:NSubjects
             observerAgeInYrs = tmp.cals{1}.describe.cache.OBSERVER_AGE;
             fractionBleached = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.fractionBleached;
             pupilDiameterMm = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.pupilDiameterMm;
-            fieldSizeDegrees = 64;
+            fieldSizeDegrees = 27.5;
             receptorObj = SSTReceptorHuman('obsAgeInYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
+            
+            % Calc contrast per validation
+            T_receptors = receptorObj.T.T_energyNormalized;
+            for jj = 1:5
+                tmp1(jj) = (T_receptors(jj, :)*(modSpdVal(:, f)-bgSpdVal(:, f)))./(T_receptors(jj, :)*bgSpdVal(:, f));
+            end
+            tmp2(:, f) = [1 1 1 0 0; 1 -1 0 0 0; 0 0 1 0 0]' \ tmp1';
             
         end
     end
+    
+    % Save out individual splatter
+    dlmwrite(outFileIndividualSplatterLMS_LMSContrast, [str2double(subjectIDs{d}(6:9)) tmp2(1, :)], '-append');
+    dlmwrite(outFileIndividualSplatterLMS_LMinusMContrast, [str2double(subjectIDs{d}(6:9)) tmp2(2, :)], '-append');
+    dlmwrite(outFileIndividualSplatterLMS_SMinusLMSContrast, [str2double(subjectIDs{d}(6:9)) tmp2(3, :)], '-append');
+    
+    
     bgSpdValMean = median(bgSpdVal, 2);
     modSpdValMean = median(modSpdVal, 2);
     
