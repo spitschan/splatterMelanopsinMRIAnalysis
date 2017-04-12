@@ -108,7 +108,7 @@ fclose(fid);
 
 % Load the files
 for d = 1:NSubjects
-    outFile = fullfile(outTableDir, ['Spectra_sub' num2str(d, '%03g') '.csv']);
+    outFile = fullfile(outTableDir, ['Spectra_' subjectIDs{d} '.csv']);
     fid = fopen(outFile, 'w');
     fprintf(fid, headerSpectra);
     fclose(fid);
@@ -188,7 +188,7 @@ for d = 1:NSubjects
     irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Photopic', [], num2str(eyeLengthMm));
     
     fid = fopen(outFileSplatter, 'a');
-    fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'Mel', ['sub' num2str(d, '%03g')], observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
+    fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'Mel', subjectIDs{d}, observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
         irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d));
     fclose(fid);
     
@@ -268,7 +268,7 @@ for d = 1:NSubjects
     irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Photopic', [], num2str(eyeLengthMm));
     
     fid = fopen(outFileSplatter, 'a');
-    fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'LMS', ['sub' num2str(d, '%03g')], observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
+    fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'LMS', subjectIDs{d}, observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
         irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d));
     fclose(fid);
     
