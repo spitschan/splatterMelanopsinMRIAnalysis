@@ -36,6 +36,8 @@ subjectIDs={'MELA_0074',...
     'MELA_0077',...
     'MELA_0081',...
     };
+[~, s] = sort(subjectIDs)
+subjectIDs = subjectIDs{s};
 
 theMelData = {'040517/Cache-MelanopsinDirectedSuperMaxMel_MELA_0074_040517' ...
     '040417/Cache-MelanopsinDirectedSuperMaxMel_MELA_0087_040417' ...
@@ -57,8 +59,9 @@ theMelData = {'040517/Cache-MelanopsinDirectedSuperMaxMel_MELA_0074_040517' ...
     '020617/Cache-MelanopsinDirectedSuperMaxMel_MELA_0075_020617' ...
     '020817/Cache-MelanopsinDirectedSuperMaxMel_MELA_0077_020817' ...
     '021017/Cache-MelanopsinDirectedSuperMaxMel_MELA_0081_021017'};
-    %' ...
-    
+%' ...
+theMelData = theMelData{s};
+
 theLMSData = {'040517/Cache-LMSDirectedSuperMaxLMS_MELA_0074_040517' ...
     '040417/Cache-LMSDirectedSuperMaxLMS_MELA_0087_040417' ...
     '033117/Cache-LMSDirectedSuperMaxLMS_MELA_0089_033117' ...
@@ -79,7 +82,8 @@ theLMSData = {'040517/Cache-LMSDirectedSuperMaxLMS_MELA_0074_040517' ...
     '020617/Cache-LMSDirectedSuperMaxLMS_MELA_0075_020617' ...
     '020817/Cache-LMSDirectedSuperMaxLMS_MELA_0077_020817' ...
     '021017/Cache-LMSDirectedSuperMaxLMS_MELA_0081_021017'};
-    %' ...
+%' ...
+theLMSData = theLMSData{s};
 
 % Turn off some warnings
 warning('off', 'MATLAB:load:cannotInstantiateLoadedVariable');
@@ -133,7 +137,7 @@ for d = 1:NSubjects
             theFolders(k) = [ ];
         end
     end
-
+    
     % Iterate over the folders
     for f = 1:length(theFolders)
         % Go to the folder
@@ -182,7 +186,7 @@ for d = 1:NSubjects
     irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpdValMean, WlsToS(wls),pupilAreaMm2,eyeLengthMm);
     irradianceScotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Scotopic', [], num2str(eyeLengthMm));
     irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Photopic', [], num2str(eyeLengthMm));
-
+    
     fid = fopen(outFileSplatter, 'a');
     fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'Mel', ['sub' num2str(d, '%03g')], observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
         irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d));
@@ -197,7 +201,7 @@ for d = 1:NSubjects
     
     % Find the folders
     theFolders = dir(fullfile(dropboxBasePath, dataPath));
-       
+    
     for k = length(theFolders):-1:1
         % remove non-folders
         if ~theFolders(k).isdir
@@ -211,8 +215,8 @@ for d = 1:NSubjects
             theFolders(k) = [ ];
         end
     end
-     test(d) = length(theFolders);
-     
+    test(d) = length(theFolders);
+    
     % Iterate over the folders
     for f = 1:length(theFolders)
         % Go to the folder
@@ -251,7 +255,7 @@ for d = 1:NSubjects
     end
     postRecepContrastsFixedLMS(:, d) = [1 1 1 0 0; 1 -1 0 0 0; 0 0 1 0 0]' \ contrastsFixed';
     
-        % Calculate luminance and chromaticy
+    % Calculate luminance and chromaticy
     luminance = T_xyz(2, :)*bgSpdValMean;
     chromaticity = (T_xyz([1 2], :)*bgSpdValMean)/sum((T_xyz*bgSpdValMean));
     
@@ -262,7 +266,7 @@ for d = 1:NSubjects
     irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpdValMean, WlsToS(wls),pupilAreaMm2,eyeLengthMm);
     irradianceScotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Scotopic', [], num2str(eyeLengthMm));
     irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Photopic', [], num2str(eyeLengthMm));
-
+    
     fid = fopen(outFileSplatter, 'a');
     fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'LMS', ['sub' num2str(d, '%03g')], observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
         irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d));
@@ -289,7 +293,7 @@ subplot(1, 2, 2);
 ScatterplotWithHistogram(postRecepContrastsFixedLMS(1, :), postRecepContrastsFixedLMS(3, :), ...
     'XBinWidth', 0.005, 'YBinWidth', 0.015, 'XLim', [3.9 4.1], 'YLim', [-0.3 0.3], ...
     'XLabel', 'L+M+S contrast', 'YLabel', 'S-(L+M+S)  contrast', 'Color', [0 0 1 ; 0 0 1], ...
-     'XRefLines', [4 4 ; -0.3 0.3], 'YRefLines', [3.9 4.1 ; 0 0], ...
+    'XRefLines', [4 4 ; -0.3 0.3], 'YRefLines', [3.9 4.1 ; 0 0], ...
     'MaxP', 1, 'PlotMarginals', false);
 % Get the error ellipse
 plot(mean(postRecepContrastsFixedLMS(1, :)), mean(postRecepContrastsFixedLMS(3, :)), '+r');
@@ -341,6 +345,6 @@ warning('on', 'MATLAB:dispatcher:UnresolvedFunctionHandle');
 warning('on', 'MATLAB:class:EnumerableClassNotFound');
 
 %% See if there's a correlation between color rating and L-M contrast
-for ii = 1:NSubjects
-   colorRatingLMS(ii) = table2array(foldedDataTable{ii}(12, 4));
-end
+% for ii = 1:NSubjects
+%     colorRatingLMS(ii) = table2array(foldedDataTable{ii}(12, 4));
+% end
