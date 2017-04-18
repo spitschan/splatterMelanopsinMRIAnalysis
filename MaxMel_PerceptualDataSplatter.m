@@ -2,6 +2,7 @@
 dropboxBasePath = '/Users/mspits/Dropbox (Aguirre-Brainard Lab)/MELA_materials/MaxMelPulsePsychophysics';
 outDir = fullfile(pwd, 'figures');
 outTableDir = fullfile(pwd, 'tables', 'perceptualdata');
+outFileSplatter = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualData.csv');
 if ~isdir(outDir)
     mkdir(outDir);
 end
@@ -104,6 +105,10 @@ fid = fopen(outFileSplatter, 'w');
 fprintf(fid, 'Stimulus,Observer,Observer age,Nominal contrast [%s],Luminance [cd/m2],Irradiance [sc td],[log10 sc td],Irradiance [ph td],[log10 ph td],x chromaticity,y chromaticity,L contrast [%s],M contrast [%s],S contrast [%s],Melanopsin contrast [%s],Rod contrast [%s],LMS contrast [%s],L-M contrast [%s],S-[L+M] contrast\n', '%', '%', '%', '%', '%', '%', '%', '%');
 fclose(fid);
 
+% Set up some 'collector' vars
+M1 = [];
+M2 = [];
+
 % Load the files
 for d = 1:NSubjects
     outFile = fullfile(outTableDir, ['Spectra_' subjectIDs{d} '.csv']);
@@ -111,8 +116,8 @@ for d = 1:NSubjects
     fprintf(fid, headerSpectra);
     fclose(fid);
     
-    M1 = [wls];
-    M2 = [wls];
+    M = [wls];
+    
     % Clear data
     clear bgSpdVal;
     clear modSpdVal;
@@ -174,13 +179,14 @@ for d = 1:NSubjects
     bgSpdValMean1 = median(bgSpdVal, 2);
     modSpdValMean1 = median(modSpdVal, 2);
     
-    T_receptors = receptorObj.T.T_energyNormalized;
+    T_receptors = receptorObj{d}.T.T_energyNormalized;
     for jj = 1:5
         contrastsFixed(jj) = (T_receptors(jj, :)*(modSpdValMean1(:, end)-bgSpdValMean1))./(T_receptors(jj, :)*bgSpdValMean1);
     end
     postRecepContrastsFixedMel(:, d) = [1 1 1 0 0; 1 -1 0 0 0; 0 0 1 0 0]' \ contrastsFixed';
     
     M1 = [M1 bgSpdValMean1 modSpdValMean1];
+    M = [bgSpdValMean1 modSpdValMean1];
     
     % Calculate luminance and chromaticy
     luminance = T_xyz(2, :)*bgSpdValMean1;
@@ -254,7 +260,9 @@ for d = 1:NSubjects
     bgSpdValMean2 = median(bgSpdVal, 2);
     modSpdValMean2 = median(modSpdVal, 2);
     
+    M = [bgSpdValMean2 modSpdValMean2];
     M2 = [M2 bgSpdValMean2 modSpdValMean2];
+    
     
     T_receptors = receptorObj{d}.T.T_energyNormalized;
     for jj = 1:5
@@ -355,3 +363,110 @@ warning('on', 'MATLAB:class:EnumerableClassNotFound');
 % for ii = 1:NSubjects
 %     colorRatingLMS(ii) = table2array(foldedDataTable{ii}(12, 4));
 % end
+
+idx = [1:2:40 ; 2:2:40]';
+for d = 1:NSubjects
+    clear postRecepContrasts;
+    for k = 1:NSamples
+        clear contrastsStochastic;
+        T_receptors = receptorObj{d}.Ts{k}.T_energyNormalized;
+        
+        bgSpd = M1(:, idx(d, 1));
+        modSpd = M1(:, idx(d, 2));
+        for jj = 1:3
+            contrastsStochastic(:, jj) = (T_receptors(jj, :)*(modSpd(:, end)-bgSpd))./(T_receptors(jj, :)*bgSpd);
+        end
+        postRecepContrastsMel{d}(:, k) = [1 1 1; 1 -1 0; 0 0 1]' \ contrastsStochastic';
+    end
+end
+
+for d = 1:NSubjects
+    clear postRecepContrasts;
+    for k = 1:NSamples
+        clear contrastsStochastic;
+        T_receptors = receptorObj{d}.Ts{k}.T_energyNormalized;
+        
+        bgSpd = M2(:, idx(d, 1));
+        modSpd = M2(:, idx(d, 2));
+        for jj = 1:3
+            contrastsStochastic(:, jj) = (T_receptors(jj, :)*(modSpd(:, end)-bgSpd))./(T_receptors(jj, :)*bgSpd);
+        end
+        postRecepContrastsLMS{d}(:, k) = [1 1 1; 1 -1 0; 0 0 1]' \ contrastsStochastic';
+    end
+end
+
+% Plot the biological splatter
+fig1 = figure;
+% LMS spectra
+subplot(1, 2, 1);
+for d = 1:NSubjects
+    ScatterplotWithHistogram(postRecepContrastsLMS{d}(1, :), postRecepContrastsLMS{d}(2, :), ...
+        'XBinWidth', 0.005, 'YBinWidth', 0.015, 'XLim', [3.0 5.0], 'YLim', [-0.4 0.4], ...
+        'XLabel', 'L+M+S contrast', 'YLabel', 'L-M  contrast', 'Color', [1 0.5 0 ; 1 0.5 0], ...
+        'XRefLines', [4 4 ; -0.4 0.4], 'YRefLines', [3.0 5.0 ; 0 0], ...
+        'MaxP', 1, 'PlotMarginals', false);
+end
+tmp = [postRecepContrastsLMS{:}];
+% Get the error ellipse
+plot(mean(tmp(1, :)), mean(tmp(2, :)), '+r');
+[X, Y] = get_error_ellipse([tmp(1, :) ; tmp(2, :)]', 0.95); hold on;
+plot(X, Y, '-k');
+
+subplot(1, 2, 2);
+for d = 1:NSubjects
+    ScatterplotWithHistogram(postRecepContrastsLMS{d}(1, :), postRecepContrastsLMS{d}(3, :), ...
+        'XBinWidth', 0.005, 'YBinWidth', 0.015, 'XLim', [3.0 5.0], 'YLim', [-2 2], ...
+        'XLabel', 'L+M+S contrast', 'YLabel', 'S  contrast', 'Color', [0 0 1 ; 0 0 1], ...
+        'XRefLines', [4 4 ; -2 2], 'YRefLines', [3.0 5.0 ; 0 0], ...
+        'MaxP', 1, 'PlotMarginals', false);
+end
+% Get the error ellipse
+plot(mean(tmp(1, :)), mean(tmp(3, :)), '+r');
+[X, Y] = get_error_ellipse([tmp(1, :) ; tmp(3, :)]', 0.95); hold on;
+plot(X, Y, '-k');
+
+% Save figure
+set(fig1, 'PaperPosition', [0 0 8 3]);
+set(fig1, 'PaperSize', [8 3]);
+set(fig1, 'Color', 'w');
+set(fig1, 'InvertHardcopy', 'off');
+saveas(fig1, fullfile(outDir, 'FigureX_PerceptualDataPhysiologicalSplatterLMS'), 'pdf');
+close(fig1);
+
+% Plot the biological splatter
+fig2 = figure;
+% Mel spectra
+subplot(1, 2, 1);
+for d = 1:NSubjects
+    ScatterplotWithHistogram(postRecepContrastsMel{d}(1, :), postRecepContrastsMel{d}(2, :), ...
+        'XBinWidth', 0.005, 'YBinWidth', 0.015, 'XLim', [-0.1 0.1], 'YLim', [-0.05 0.05], ...
+        'XLabel', 'L+M+S contrast', 'YLabel', 'L-M  contrast', 'Color', [1 0.5 0 ; 1 0.5 0], ...
+        'XRefLines', [0 0 ; -0.1 0.1], 'YRefLines', [-0.1 0.1 ; 0 0], ...
+        'MaxP', 1, 'PlotMarginals', false);
+end
+tmp = [postRecepContrastsMel{:}];
+% Get the error ellipse
+plot(mean(tmp(1, :)), mean(tmp(2, :)), '+r');
+[X, Y] = get_error_ellipse([tmp(1, :) ; tmp(2, :)]', 0.95); hold on;
+plot(X, Y, '-k');
+
+subplot(1, 2, 2);
+for d = 1:NSubjects
+    ScatterplotWithHistogram(postRecepContrastsMel{d}(1, :), postRecepContrastsMel{d}(3, :), ...
+    'XBinWidth', 0.005, 'YBinWidth', 0.015, 'XLim', [-0.1 0.1], 'YLim', [-0.3 0.3], ...
+    'XLabel', 'L+M+S contrast', 'YLabel', 'S-(L+M+S)  contrast', 'Color', [0 0 1 ; 0 0 1], ...
+    'XRefLines', [0 0 ; -0.3 0.3], 'YRefLines', [-0.1 0.1 ; 0 0], ...
+    'MaxP', 1, 'PlotMarginals', false);
+end
+% Get the error ellipse
+plot(mean(tmp(1, :)), mean(tmp(3, :)), '+r');
+[X, Y] = get_error_ellipse([tmp(1, :) ; tmp(3, :)]', 0.95); hold on;
+plot(X, Y, '-k');
+
+% Save figure
+set(fig2, 'PaperPosition', [0 0 8 3]);
+set(fig2, 'PaperSize', [8 3]);
+set(fig2, 'Color', 'w');
+set(fig2, 'InvertHardcopy', 'off');
+saveas(fig2, fullfile(outDir, 'FigureX_PerceptualDataPhysiologicalSplatterMel'), 'pdf');
+close(fig2);
