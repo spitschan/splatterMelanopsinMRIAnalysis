@@ -1,5 +1,5 @@
 % Define the paths
-dropboxBasePath = '/Users/mspits/Dropbox (Aguirre-Brainard Lab)';
+dropboxBasePath = '/Users/spitschan/Dropbox (Aguirre-Brainard Lab)';
 outDir = fullfile(pwd, 'tables');
 if ~isdir(outDir)
     mkdir(outDir);
@@ -47,7 +47,7 @@ theContrastLevels = {[400] [400] [400] [400] ...
     [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
 
 fid = fopen(fullfile(outDir, 'TableX_Splatter.csv'), 'w');
-fprintf(fid, 'Stimulus,Observer,Actual observer age,Validated observer age,Nominal contrast [%s],Luminance [cd/m2],SD,Irradiance [sc td],[log10 sc td],SD,Irradiance [ph td],[log10 ph td],SD,x chromaticity,SD,y chromaticity,SD,L contrast [%s],SD,M contrast [%s],SD,S contrast [%s],SD,Melanopsin contrast [%s],SD,Rod contrast [%s],SD,LMS contrast [%s],SD,L-M contrast [%s],SD,S-[L+M+ contrast [%s],SD,\n', '%', '%', '%', '%', '%', '%', '%', '%', '%s');
+fprintf(fid, 'Stimulus,Observer,Actual observer age,Validated observer age,Nominal contrast [%s],Luminance [cd/m2],SD,Irradiance [sc td],[log10 sc td],SD,Irradiance [ph td],[log10 ph td],SD,x chromaticity,SD,y chromaticity,SD,L contrast [%s],SD,M contrast [%s],SD,S contrast [%s],SD,Melanopsin contrast [%s],SD,Rod contrast [%s],SD,LMS contrast [%s],SD,L-M contrast [%s],SD,S-[L+M] contrast [%s],SD,\n', '%', '%', '%', '%', '%', '%', '%', '%', '%');
 
 currDir = pwd;
 Mc = [];
