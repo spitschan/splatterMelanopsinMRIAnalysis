@@ -309,7 +309,7 @@ for d = 1:NSubjects
     
     fid = fopen(outFileSplatter, 'a');
     fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'LMS', subjectIDs{d}, observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
-        irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d), 100*postRecepContrastsFixedMel(3, d));
+        irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedLMS(1, d), 100*postRecepContrastsFixedLMS(2, d), 100*postRecepContrastsFixedLMS(3, d));
     fclose(fid);
     
     % Write the table
