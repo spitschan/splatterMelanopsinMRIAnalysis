@@ -1,5 +1,5 @@
 % Define the paths
-dropboxBasePath = '/Users/spitschan/Dropbox (Aguirre-Brainard Lab)';
+dropboxBasePath = '/Users/mspits/Dropbox (Aguirre-Brainard Lab)';
 outDir = fullfile(pwd, 'tables');
 if ~isdir(outDir)
     mkdir(outDir);
@@ -47,7 +47,7 @@ theContrastLevels = {[400] [400] [400] [400] ...
     [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2] [0.25 0.5 1 2]};
 
 fid = fopen(fullfile(outDir, 'TableX_Splatter.csv'), 'w');
-fprintf(fid, 'Stimulus,Observer,Actual observer age,Validated observer age,Nominal contrast [%s],Luminance [cd/m2],SD,Irradiance [sc td],[log10 sc td],SD,Irradiance [ph td],[log10 ph td],SD,x chromaticity,SD,y chromaticity,SD,L contrast [%s],SD,M contrast [%s],SD,S contrast [%s],SD,Melanopsin contrast [%s],SD,Rod contrast [%s],SD,LMS contrast [%s],SD,L-M contrast [%s],SD\n', '%', '%', '%', '%', '%', '%', '%', '%');
+fprintf(fid, 'Stimulus,Observer,Actual observer age,Validated observer age,Nominal contrast [%s],Luminance [cd/m2],SD,Irradiance [sc td],[log10 sc td],SD,Irradiance [ph td],[log10 ph td],SD,x chromaticity,SD,y chromaticity,SD,L contrast [%s],SD,M contrast [%s],SD,S contrast [%s],SD,Melanopsin contrast [%s],SD,Rod contrast [%s],SD,LMS contrast [%s],SD,L-M contrast [%s],SD,S-[L+M+ contrast [%s],SD,\n', '%', '%', '%', '%', '%', '%', '%', '%', '%s');
 
 currDir = pwd;
 Mc = [];
@@ -144,7 +144,7 @@ for d = 1:length(theDataPaths)
                 for jj = 1:size(T_rec, 1)
                     contrasts{kk-1}(:, f) = (T_rec*(modSpd-bgSpd))./(T_rec*bgSpd);
                 end
-                postRecepContrasts{kk-1}(:, f) = [1 1 1 0 0; 1 -1 0 0 0]' \ contrasts{kk-1}(:, f);
+                postRecepContrasts{kk-1}(:, f) = [1 1 1 0 0 ; 1 -1 0 0 0 ; 0 0 1 0 0]' \ contrasts{kk-1}(:, f);
             end
         end
     end
@@ -183,7 +183,7 @@ for d = 1:length(theDataPaths)
     for ii = 1:NContrastLevels
         fprintf(fid, '%s,%s,%i,%i,%.2f,', theStimuli{d}, theObservers{d}, theObserverAge(d), theValidatedObserverAge(d), theContrastLevels{d}(ii));
         for jj = 1:size(Mb, 2)
-            if ii > 1 && jj < 13
+            if ii > 1 && jj < 14
                 fprintf(fid, ',');
             else
                 fprintf(fid, '%.2f,', Mb(ii, jj));

@@ -110,7 +110,7 @@ headerSpectra = 'Wavelength [nm],Background (Mel),Modulation (Mel),Background (L
 
 % Save splatter table
 fid = fopen(outFileSplatter, 'w');
-fprintf(fid, 'Stimulus,Observer,Observer age,Nominal contrast [%s],Luminance [cd/m2],Irradiance [sc td],[log10 sc td],Irradiance [ph td],[log10 ph td],x chromaticity,y chromaticity,L contrast [%s],M contrast [%s],S contrast [%s],Melanopsin contrast [%s],Rod contrast [%s],LMS contrast [%s],L-M contrast [%s]\n', '%', '%', '%', '%', '%', '%', '%', '%');
+fprintf(fid, 'Stimulus,Observer,Observer age,Nominal contrast [%s],Luminance [cd/m2],Irradiance [sc td],[log10 sc td],Irradiance [ph td],[log10 ph td],x chromaticity,y chromaticity,L contrast [%s],M contrast [%s],S contrast [%s],Melanopsin contrast [%s],Rod contrast [%s],LMS contrast [%s],L-M contrast [%s],S-[L+M] contrast\n', '%', '%', '%', '%', '%', '%', '%', '%');
 fclose(fid);
 
 % Load the files
@@ -212,8 +212,8 @@ for d = 1:NSubjects
     irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Photopic', [], num2str(eyeLengthMm));
     
     fid = fopen(outFileSplatter, 'a');
-    fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'Mel', subjectIDs{d}, observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
-        irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d));
+    fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'Mel', subjectIDs{d}, observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
+        irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d), 100*postRecepContrastsFixedMel(3, d));
     fclose(fid);
     
     % Clear data
@@ -308,8 +308,8 @@ for d = 1:NSubjects
     irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Photopic', [], num2str(eyeLengthMm));
     
     fid = fopen(outFileSplatter, 'a');
-    fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'LMS', subjectIDs{d}, observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
-        irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d));
+    fprintf(fid, '%s,%s,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n', 'LMS', subjectIDs{d}, observerAgeInYrs, 400, luminance, irradianceScotTrolands, log10(irradianceScotTrolands), ...
+        irradiancePhotTrolands, log10(irradiancePhotTrolands), chromaticity(1), chromaticity(2), 100*contrastsFixed(1), 100*contrastsFixed(2), 100*contrastsFixed(3), 100*contrastsFixed(4), 100*contrastsFixed(5), 100*postRecepContrastsFixedMel(1, d), 100*postRecepContrastsFixedMel(2, d), 100*postRecepContrastsFixedMel(3, d));
     fclose(fid);
     
     % Write the table
@@ -332,7 +332,7 @@ plot(X, Y, '-k');
 subplot(1, 2, 2);
 ScatterplotWithHistogram(postRecepContrastsFixedLMS(1, :), postRecepContrastsFixedLMS(3, :), ...
     'XBinWidth', 0.005, 'YBinWidth', 0.015, 'XLim', [3.9 4.1], 'YLim', [-0.3 0.3], ...
-    'XLabel', 'L+M+S contrast', 'YLabel', 'S-(L+M+S)  contrast', 'Color', [0 0 1 ; 0 0 1], ...
+    'XLabel', 'L+M+S contrast', 'YLabel', 'S-[L+M]  contrast', 'Color', [0 0 1 ; 0 0 1], ...
     'XRefLines', [4 4 ; -0.3 0.3], 'YRefLines', [3.9 4.1 ; 0 0], ...
     'MaxP', 1, 'PlotMarginals', false);
 % Get the error ellipse
