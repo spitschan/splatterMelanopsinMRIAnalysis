@@ -10,15 +10,6 @@ if ~isdir(outTableDir)
     mkdir(outTableDir);
 end
 
-outFileSplatter = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualData.csv');
-outFileIndividualSplatterLMS_LMSContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_LMS_LMSContrast.csv');
-outFileIndividualSplatterLMS_LMinusMContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_LMS_LMinusMContrast.csv');
-outFileIndividualSplatterLMS_SMinusLMSContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_LMS_SMinusLMSContrast.csv');
-
-outFileIndividualSplatterMel_LMSContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_Mel_LMSContrast.csv');
-outFileIndividualSplatterMel_LMinusMContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_Mel_LMinusMContrast.csv');
-outFileIndividualSplatterMel_SMinusLMSContrast = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualDataIndividual_Mel_SMinusLMSContrast.csv');
-
 % Define the # of subjects
 NSubjects = 20;
 
@@ -120,7 +111,8 @@ for d = 1:NSubjects
     fprintf(fid, headerSpectra);
     fclose(fid);
     
-    M = [wls];
+    M1 = [wls];
+    M2 = [wls];
     % Clear data
     clear bgSpdVal;
     clear modSpdVal;
@@ -166,48 +158,39 @@ for d = 1:NSubjects
             fractionBleached = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.fractionBleached;
             pupilDiameterMm = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.pupilDiameterMm;
             fieldSizeDegrees = 27.5;
-            receptorObj = SSTReceptorHuman('verbosity', 'none', 'obsAgeInYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
-            
             
             % Get the background spectrum
             bgSpdVal(:, f) = tmp.cals{1}.modulationBGMeas.meas.pr650.spectrum;
             modSpdVal(:, f) = tmp.cals{1}.modulationMaxMeas.meas.pr650.spectrum;
             
-            % Calc contrast per validation
-            T_receptors = receptorObj.T.T_energyNormalized;
-            for jj = 1:5
-                tmp1(jj) = (T_receptors(jj, :)*(modSpdVal(:, f)-bgSpdVal(:, f)))./(T_receptors(jj, :)*bgSpdVal(:, f));
+            if f == 1
+                receptorObj{d} = SSTReceptorHuman('verbosity', 'none', 'obsAgeInYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
+                NSamples = 1000;
+                receptorObj{d}.makeSpectralSensitivitiesStochastic('NSamples', NSamples);
             end
-            tmp2(:, f) = [1 1 1 0 0; 1 -1 0 0 0; 0 0 1 0 0]' \ tmp1';
         end
     end
     
-    % Save out individual splatter
-    dlmwrite(outFileIndividualSplatterMel_LMSContrast, [str2double(subjectIDs{d}(6:9)) tmp2(1, :)], '-append');
-    dlmwrite(outFileIndividualSplatterMel_LMinusMContrast, [str2double(subjectIDs{d}(6:9)) tmp2(2, :)], '-append');
-    dlmwrite(outFileIndividualSplatterMel_SMinusLMSContrast, [str2double(subjectIDs{d}(6:9)) tmp2(3, :)], '-append');
-    
-    
-    bgSpdValMean = median(bgSpdVal, 2);
-    modSpdValMean = median(modSpdVal, 2);
+    bgSpdValMean1 = median(bgSpdVal, 2);
+    modSpdValMean1 = median(modSpdVal, 2);
     
     T_receptors = receptorObj.T.T_energyNormalized;
     for jj = 1:5
-        contrastsFixed(jj) = (T_receptors(jj, :)*(modSpdValMean(:, end)-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
+        contrastsFixed(jj) = (T_receptors(jj, :)*(modSpdValMean1(:, end)-bgSpdValMean1))./(T_receptors(jj, :)*bgSpdValMean1);
     end
     postRecepContrastsFixedMel(:, d) = [1 1 1 0 0; 1 -1 0 0 0; 0 0 1 0 0]' \ contrastsFixed';
     
-    M = [M bgSpdValMean modSpdValMean];
+    M1 = [M1 bgSpdValMean1 modSpdValMean1];
     
     % Calculate luminance and chromaticy
-    luminance = T_xyz(2, :)*bgSpdValMean;
-    chromaticity = (T_xyz([1 2], :)*bgSpdValMean)/sum((T_xyz*bgSpdValMean));
+    luminance = T_xyz(2, :)*bgSpdValMean1;
+    chromaticity = (T_xyz([1 2], :)*bgSpdValMean1)/sum((T_xyz*bgSpdValMean1));
     
     % Calculate irradiance
     pupilAreaMm2 = pi*((pupilDiameterMm/2)^2);
     eyeLengthMm = 17;
     degPerMm = RetinalMMToDegrees(1,eyeLengthMm);
-    irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpdValMean, WlsToS(wls),pupilAreaMm2,eyeLengthMm);
+    irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpdValMean1, WlsToS(wls),pupilAreaMm2,eyeLengthMm);
     irradianceScotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Scotopic', [], num2str(eyeLengthMm));
     irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Photopic', [], num2str(eyeLengthMm));
     
@@ -241,7 +224,6 @@ for d = 1:NSubjects
             theFolders(k) = [ ];
         end
     end
-    test(d) = length(theFolders);
     
     % Iterate over the folders
     for f = 1:length(theFolders)
@@ -266,44 +248,29 @@ for d = 1:NSubjects
             fractionBleached = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.fractionBleached;
             pupilDiameterMm = tmp.cals{1}.describe.cache.data(observerAgeInYrs).describe.params.pupilDiameterMm;
             fieldSizeDegrees = 27.5;
-            receptorObj = SSTReceptorHuman('obsAgeInYrs', observerAgeInYrs, 'fieldSizeDeg', fieldSizeDegrees, 'obsPupilDiameterMm', pupilDiameterMm);
-            
-            % Calc contrast per validation
-            T_receptors = receptorObj.T.T_energyNormalized;
-            for jj = 1:5
-                tmp1(jj) = (T_receptors(jj, :)*(modSpdVal(:, f)-bgSpdVal(:, f)))./(T_receptors(jj, :)*bgSpdVal(:, f));
-            end
-            tmp2(:, f) = [1 1 1 0 0; 1 -1 0 0 0; 0 0 1 0 0]' \ tmp1';
-            
         end
     end
     
-    % Save out individual splatter
-    dlmwrite(outFileIndividualSplatterLMS_LMSContrast, [str2double(subjectIDs{d}(6:9)) tmp2(1, :)], '-append');
-    dlmwrite(outFileIndividualSplatterLMS_LMinusMContrast, [str2double(subjectIDs{d}(6:9)) tmp2(2, :)], '-append');
-    dlmwrite(outFileIndividualSplatterLMS_SMinusLMSContrast, [str2double(subjectIDs{d}(6:9)) tmp2(3, :)], '-append');
+    bgSpdValMean2 = median(bgSpdVal, 2);
+    modSpdValMean2 = median(modSpdVal, 2);
     
+    M2 = [M2 bgSpdValMean2 modSpdValMean2];
     
-    bgSpdValMean = median(bgSpdVal, 2);
-    modSpdValMean = median(modSpdVal, 2);
-    
-    M = [M bgSpdValMean modSpdValMean];
-    
-    T_receptors = receptorObj.T.T_energyNormalized;
+    T_receptors = receptorObj{d}.T.T_energyNormalized;
     for jj = 1:5
-        contrastsFixed(jj) = (T_receptors(jj, :)*(modSpdValMean(:, end)-bgSpdValMean))./(T_receptors(jj, :)*bgSpdValMean);
+        contrastsFixed(jj) = (T_receptors(jj, :)*(modSpdValMean2(:, end)-bgSpdValMean2))./(T_receptors(jj, :)*bgSpdValMean2);
     end
     postRecepContrastsFixedLMS(:, d) = [1 1 1 0 0; 1 -1 0 0 0; 0 0 1 0 0]' \ contrastsFixed';
     
     % Calculate luminance and chromaticy
-    luminance = T_xyz(2, :)*bgSpdValMean;
-    chromaticity = (T_xyz([1 2], :)*bgSpdValMean)/sum((T_xyz*bgSpdValMean));
+    luminance = T_xyz(2, :)*bgSpdValMean2;
+    chromaticity = (T_xyz([1 2], :)*bgSpdValMean2)/sum((T_xyz*bgSpdValMean2));
     
     % Calculate irradiance
     pupilAreaMm2 = pi*((pupilDiameterMm/2)^2);
     eyeLengthMm = 17;
     degPerMm = RetinalMMToDegrees(1,eyeLengthMm);
-    irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpdValMean, WlsToS(wls),pupilAreaMm2,eyeLengthMm);
+    irradianceWattsPerUm2 = RadianceToRetIrradiance(bgSpdValMean2, WlsToS(wls),pupilAreaMm2,eyeLengthMm);
     irradianceScotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Scotopic', [], num2str(eyeLengthMm));
     irradiancePhotTrolands = RetIrradianceToTrolands(irradianceWattsPerUm2, WlsToS(wls), 'Photopic', [], num2str(eyeLengthMm));
     
