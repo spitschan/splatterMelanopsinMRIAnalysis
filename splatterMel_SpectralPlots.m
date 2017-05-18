@@ -1,9 +1,6 @@
-function splatterMel_SpectralPlots(ppsRawDataDir)
+function splatterMel_SpectralPlots(ppsRawDataDir, analysisDir)
 % Define the paths
-outDir = fullfile(pwd, 'figures');
-if ~isdir(outDir)
-    mkdir(outDir);
-end
+outDir = fullfile(analysisDir, 'figures');
 
 theDataPaths = {'MaxLMS400pct/HERO_asb1/040716/StimulusFiles/Cache-LMSDirectedSuperMaxLMS/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
     'MaxLMSCRF/HERO_asb1/060816/StimulusFiles/Cache-LMSDirectedSuperMaxLMS/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...

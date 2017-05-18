@@ -1,10 +1,7 @@
-function splatterMel_PhysiologicalSplatterAnalysis(ppsRawDataDir)
+function splatterMel_PhysiologicalSplatterAnalysis(ppsRawDataDir, analysisDir)
 
 % Define the paths
-outDir = fullfile(pwd, 'figures');
-if ~isdir(outDir)
-    mkdir(outDir);
-end
+outDir = fullfile(analysisDir, 'figures');
 
 whichDataSet = 'LMS400Only';
 % Define the data paths

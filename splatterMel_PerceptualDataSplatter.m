@@ -1,12 +1,8 @@
-function splatterMel_PerceptualDataSplatter(ppsRawDataDir);
+function splatterMel_PerceptualDataSplatter(ppsRawDataDir, analysisDir);
 
-outDir = fullfile(pwd, 'figures');
-outTableDir = fullfile(pwd, 'tables', 'perceptualdata');
-outFileSplatter = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualData.csv');
-if ~isdir(outDir)
-    mkdir(outDir);
-end
-
+outDir = fullfile(analysisDir, 'figures');
+outTableDir = fullfile(analysisDir, 'tables', 'perceptualdata');
+outFileSplatter = fullfile(analysisDir, 'tables', 'TableX_SplatterPerceptualData.csv');
 if ~isdir(outTableDir)
     mkdir(outTableDir);
 end

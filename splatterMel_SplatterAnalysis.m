@@ -1,10 +1,7 @@
-function splatterMel_SplatterAnalysis(ppsRawDataDir)
+function splatterMel_SplatterAnalysis(ppsRawDataDir, analysisDir)
 
 % Define the paths
-outDir = fullfile(pwd, 'tables');
-if ~isdir(outDir)
-    mkdir(outDir);
-end
+outDir = fullfile(analysisDir, 'tables');
 
 theDataPaths = {'MaxLMS400pct/HERO_asb1/040716/StimulusFiles/Cache-LMSDirectedSuperMaxLMS/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
     'MaxLMS400pct/HERO_aso1/033016/StimulusFiles/Cache-LMSDirectedSuperMaxLMS/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
