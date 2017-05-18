@@ -1,5 +1,6 @@
+function splatterMel_SpectraTable(ppsRawDataDir)
+
 % Define the paths
-dropboxBasePath = '/Users/spitschan/Dropbox (Aguirre-Brainard Lab)';
 outDir = fullfile(pwd, 'tables', 'spectra');
 if ~isdir(outDir)
     mkdir(outDir);
@@ -61,7 +62,7 @@ for d = 1:length(theDataPaths)
     dataPath = theDataPaths{d};
     
     % Find the folders
-    theFolders = dir(fullfile(dropboxBasePath, dataPath));
+    theFolders = dir(fullfile(ppsRawDataDir, dataPath));
     
     % Increment the counter
     clear bgSpdVal;
@@ -86,8 +87,8 @@ for d = 1:length(theDataPaths)
     % Iterate over the folders
     for f = 1:length(theFolders)
         % Go to the folder
-        if isdir(fullfile(dropboxBasePath, dataPath, theFolders(f).name))
-            cd(fullfile(dropboxBasePath, dataPath, theFolders(f).name));
+        if isdir(fullfile(ppsRawDataDir, dataPath, theFolders(f).name))
+            cd(fullfile(ppsRawDataDir, dataPath, theFolders(f).name));
         end
         
         % Find the only MAT file there is going to be

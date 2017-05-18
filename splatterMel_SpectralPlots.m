@@ -1,15 +1,15 @@
+function splatterMel_SpectralPlots(ppsRawDataDir)
 % Define the paths
-dropboxBasePath = '/Users/spitschan/Dropbox (Aguirre-Brainard Lab)';
 outDir = fullfile(pwd, 'figures');
 if ~isdir(outDir)
     mkdir(outDir);
 end
 
-theDataPaths = {'MELA_data/MelanopsinMR_fMRI/MaxLMS400pct/HERO_asb1/040716/StimulusFiles/Cache-LMSDirectedSuperMaxLMS/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/MaxLMSCRF/HERO_asb1/060816/StimulusFiles/Cache-LMSDirectedSuperMaxLMS/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/MaxMel400pct/HERO_asb1/032416/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/MaxMelCRF/HERO_asb1/060716/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
-    'MELA_data/MelanopsinMR_fMRI/SplatterControlCRF/HERO_asb1/051016/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
+theDataPaths = {'MaxLMS400pct/HERO_asb1/040716/StimulusFiles/Cache-LMSDirectedSuperMaxLMS/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
+    'MaxLMSCRF/HERO_asb1/060816/StimulusFiles/Cache-LMSDirectedSuperMaxLMS/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
+    'MaxMel400pct/HERO_asb1/032416/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableCStubby1_ND00/23-Mar-2016_12_31_27/validation' ...
+    'MaxMelCRF/HERO_asb1/060716/StimulusFiles/Cache-MelanopsinDirectedSuperMaxMel/BoxARandomizedLongCableBStubby1_ND00/29-May-2016_14_48_42/validation' ...
+    'SplatterControlCRF/HERO_asb1/051016/StimulusFiles/Cache-MaxMelPostreceptoralSplatterControl/BoxARandomizedLongCableCStubby1_ND00/18-Apr-2016_10_23_32/validation'};
 
 theStimuli = {'LMS 400%' 'LMS CRF' 'Mel 400%' 'Mel CRF' 'Splatter CRF'};
 close all;
@@ -33,7 +33,7 @@ for d = 1:length(theDataPaths)
     dataPath = theDataPaths{d};
     
     % Find the folders
-    theFolders = dir(fullfile(dropboxBasePath, dataPath));
+    theFolders = dir(fullfile(ppsRawDataDir, dataPath));
     
     for k = length(theFolders):-1:1
         % remove non-folders
@@ -50,7 +50,7 @@ for d = 1:length(theDataPaths)
     end
     
     % Iterate over the folders
-    cd(fullfile(dropboxBasePath, dataPath, theFolders(1).name));
+    cd(fullfile(ppsRawDataDir, dataPath, theFolders(1).name));
     
     % Find the only MAT file there is going to be
     theMATFile = dir([pwd '/*.mat']);

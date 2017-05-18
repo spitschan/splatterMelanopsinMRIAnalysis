@@ -1,5 +1,5 @@
-% Define the paths
-dropboxBasePath = '/Users/mspits/Dropbox (Aguirre-Brainard Lab)/MELA_materials/MaxMelPulsePsychophysics';
+function splatterMel_PerceptualDataSplatter(ppsRawDataDir);
+
 outDir = fullfile(pwd, 'figures');
 outTableDir = fullfile(pwd, 'tables', 'perceptualdata');
 outFileSplatter = fullfile(pwd, 'tables', 'TableX_SplatterPerceptualData.csv');
@@ -128,7 +128,7 @@ for d = 1:NSubjects
     dataPath = theMelData{d};
     
     % Find the folders
-    theFolders = dir(fullfile(dropboxBasePath, dataPath));
+    theFolders = dir(fullfile(ppsRawDataDir, dataPath));
     
     for k = length(theFolders):-1:1
         % remove non-folders
@@ -147,8 +147,8 @@ for d = 1:NSubjects
     % Iterate over the folders
     for f = 1:length(theFolders)
         % Go to the folder
-        if isdir(fullfile(dropboxBasePath, dataPath, theFolders(f).name))
-            cd(fullfile(dropboxBasePath, dataPath, theFolders(f).name));
+        if isdir(fullfile(ppsRawDataDir, dataPath, theFolders(f).name))
+            cd(fullfile(ppsRawDataDir, dataPath, theFolders(f).name));
         end
         
         % Find the only MAT file there is going to be
@@ -215,7 +215,7 @@ for d = 1:NSubjects
     dataPath = theLMSData{d};
     
     % Find the folders
-    theFolders = dir(fullfile(dropboxBasePath, dataPath));
+    theFolders = dir(fullfile(ppsRawDataDir, dataPath));
     
     for k = length(theFolders):-1:1
         % remove non-folders
@@ -234,8 +234,8 @@ for d = 1:NSubjects
     % Iterate over the folders
     for f = 1:length(theFolders)
         % Go to the folder
-        if isdir(fullfile(dropboxBasePath, dataPath, theFolders(f).name))
-            cd(fullfile(dropboxBasePath, dataPath, theFolders(f).name));
+        if isdir(fullfile(ppsRawDataDir, dataPath, theFolders(f).name))
+            cd(fullfile(ppsRawDataDir, dataPath, theFolders(f).name));
         end
         
         % Find the only MAT file there is going to be

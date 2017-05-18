@@ -1,4 +1,5 @@
-rootPwd = '/Users/mspits/Dropbox (Aguirre-Brainard Lab)/MELA_data/MelanopsinMR_fMRI';
+function splatterMel_AttentionTask(ppsRawDataDir)
+
 theFolders = {'MaxLMS400pct/HERO_asb1/040716/MatFiles' ...
     'MaxLMS400pct/HERO_aso1/033016/MatFiles' ...
     'MaxLMS400pct/HERO_gka1/040116/MatFiles' ...
@@ -37,9 +38,9 @@ fprintf(fid, 'Protocol,Subject,Date,HR,FA\n');
 
 for f1 = 1:length(theFolders)
     % Which .mat files do we have?
-    theMATFiles = dir(fullfile(rootPwd, theFolders{f1}, '/*.mat'));
+    theMATFiles = dir(fullfile(ppsRawDataDir, theFolders{f1}, '/*.mat'));
     
-    tmp0 = strsplit(fullfile(rootPwd, theFolders{f1}), '/');
+    tmp0 = strsplit(fullfile(ppsRawDataDir, theFolders{f1}), '/');
     theDate = tmp0{end-1};
     theSub = tmp0{end-2};
     theProtocol = tmp0{end-3};
@@ -50,7 +51,7 @@ for f1 = 1:length(theFolders)
     sumNotTask = 0;
     
     for f2 = 1:length(theMATFiles)
-        tmp = load(fullfile(rootPwd, theFolders{f1}, theMATFiles(f2).name));
+        tmp = load(fullfile(ppsRawDataDir, theFolders{f1}, theMATFiles(f2).name));
         
         if isfield(tmp.params, 'responseStruct')
             theResponseStruct = tmp.params.responseStruct;
