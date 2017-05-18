@@ -6,7 +6,7 @@
 		"localHookTemplate": "configuration/splatterMelanopsinMRIAnalysis",
 		"name": "splatterMelanopsinMRIAnalysis",
 		"pathPlacement": "append",
-		"subfolder": "code",
+		"subfolder": "",
 		"toolboxRoot": "",
 		"type": "git",
 		"update": "",
