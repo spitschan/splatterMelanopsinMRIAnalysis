@@ -23,7 +23,6 @@
 		"toolboxRoot": "",
 		"type": "git",
 		"update": "",
-<<<<<<< HEAD
 		"url": "https:\/\/github.com\/Spitschan\/SilentSubstitutionToolbox.git"
 	},
     {
@@ -51,8 +50,5 @@
 		"type": "include",
 		"update": "",
 		"url": ""
-=======
-		"url": "https:\/\/github.com\/spitschan\/SilentSubstitutionToolbox.git"
->>>>>>> origin/master
 	}
 ]
