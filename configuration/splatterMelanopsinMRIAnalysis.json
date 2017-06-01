@@ -8,7 +8,7 @@
 		"pathPlacement": "append",
 		"subfolder": "",
 		"toolboxRoot": "",
-		"type": "git",
+		"type": "include",
 		"update": "",
 		"url": ""
 	},
