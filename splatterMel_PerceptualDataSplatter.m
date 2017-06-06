@@ -208,7 +208,7 @@ for d = 1:NSubjects
     clear tmp2;
     
     % Load the LMS data first
-    dataPath = fullfile(subjectIDs{d},theLMSData{d});
+    dataPath = theLMSData{d};
     
     % Find the folders
     theFolders = dir(fullfile(psychoStimuliDir, dataPath));
