@@ -1,4 +1,4 @@
-function splatterMel_PerceptualDataSplatter(ppsRawDataDir, analysisDir);
+function splatterMel_PerceptualDataSplatter(psychoStimuliDir, analysisDir);
 
 outDir = fullfile(analysisDir, 'figures');
 outTableDir = fullfile(analysisDir, 'tables', 'perceptualdata');
@@ -31,7 +31,7 @@ subjectIDs={'MELA_0074',...
     'MELA_0077',...
     'MELA_0081',...
     };
-[~, s] = sort(subjectIDs)
+[~, s] = sort(subjectIDs);
 subjectIDs = {subjectIDs{s}};
 
 theMelData = {'040517/Cache-MelanopsinDirectedSuperMaxMel_MELA_0074_040517' ...
@@ -124,7 +124,7 @@ for d = 1:NSubjects
     dataPath = theMelData{d};
     
     % Find the folders
-    theFolders = dir(fullfile(ppsRawDataDir, dataPath));
+    theFolders = dir(fullfile(psychoStimuliDir, dataPath));
     
     for k = length(theFolders):-1:1
         % remove non-folders
@@ -143,8 +143,8 @@ for d = 1:NSubjects
     % Iterate over the folders
     for f = 1:length(theFolders)
         % Go to the folder
-        if isdir(fullfile(ppsRawDataDir, dataPath, theFolders(f).name))
-            cd(fullfile(ppsRawDataDir, dataPath, theFolders(f).name));
+        if isdir(fullfile(psychoStimuliDir, dataPath, theFolders(f).name))
+            cd(fullfile(psychoStimuliDir, dataPath, theFolders(f).name));
         end
         
         % Find the only MAT file there is going to be
@@ -208,10 +208,10 @@ for d = 1:NSubjects
     clear tmp2;
     
     % Load the LMS data first
-    dataPath = theLMSData{d};
+    dataPath = fullfile(subjectIDs{d},theLMSData{d});
     
     % Find the folders
-    theFolders = dir(fullfile(ppsRawDataDir, dataPath));
+    theFolders = dir(fullfile(psychoStimuliDir, dataPath));
     
     for k = length(theFolders):-1:1
         % remove non-folders
@@ -230,8 +230,8 @@ for d = 1:NSubjects
     % Iterate over the folders
     for f = 1:length(theFolders)
         % Go to the folder
-        if isdir(fullfile(ppsRawDataDir, dataPath, theFolders(f).name))
-            cd(fullfile(ppsRawDataDir, dataPath, theFolders(f).name));
+        if isdir(fullfile(psychoStimuliDir, dataPath, theFolders(f).name))
+            cd(fullfile(psychoStimuliDir, dataPath, theFolders(f).name));
         end
         
         % Find the only MAT file there is going to be
