@@ -1,4 +1,7 @@
 function splatterMel_SpectralPlots(ppsRawDataDir, analysisDir)
+
+fprintf('> Running %s\n', mfilename);
+
 % Define the paths
 outDir = fullfile(analysisDir, 'figures');
 

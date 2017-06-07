@@ -1,5 +1,8 @@
 function splatterMel_PerceptualDataSplatter(psychoStimuliDir, analysisDir);
 
+fprintf('> Running %s\n', mfilename);
+
+currDir = pwd;
 outDir = fullfile(analysisDir, 'figures');
 outTableDir = fullfile(analysisDir, 'tables', 'perceptualdata');
 outFileSplatter = fullfile(analysisDir, 'tables', 'TableX_SplatterPerceptualData.csv');
@@ -466,3 +469,5 @@ set(fig2, 'Color', 'w');
 set(fig2, 'InvertHardcopy', 'off');
 saveas(fig2, fullfile(outDir, 'FigureX_PerceptualDataPhysiologicalSplatterMel'), 'pdf');
 close(fig2);
+
+cd(currDir);

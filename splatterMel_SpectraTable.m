@@ -1,5 +1,7 @@
 function splatterMel_SpectraTable(ppsRawDataDir, analysisDir)
 
+fprintf('> Running %s\n', mfilename);
+
 % Define the paths
 outDir = fullfile(analysisDir, 'tables', 'spectra');
 if ~isdir(outDir)

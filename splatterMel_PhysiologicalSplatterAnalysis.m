@@ -1,6 +1,9 @@
 function splatterMel_PhysiologicalSplatterAnalysis(ppsRawDataDir, analysisDir)
 
+fprintf('> Running %s\n', mfilename);
+
 % Define the paths
+
 outDir = fullfile(analysisDir, 'figures');
 
 whichDataSet = 'LMS400Only';
@@ -300,6 +303,8 @@ set(fig2, 'Color', 'w');
 set(fig2, 'InvertHardcopy', 'off');
 saveas(fig2, outFile3, 'pdf');
 close(fig2);
+
+cd(currDir);
 
 % %% "Parametric" analysis
 % fig2 = figure;
