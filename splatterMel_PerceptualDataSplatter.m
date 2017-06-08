@@ -314,12 +314,12 @@ plot(mean(postRecepContrastsFixedLMS(1, :)), mean(postRecepContrastsFixedLMS(3, 
 [X, Y] = get_error_ellipse([postRecepContrastsFixedLMS(1, :) ; postRecepContrastsFixedLMS(3, :)]', 0.95); hold on;
 plot(X, Y, '-k');
 
-% Save figure
-set(fig1, 'PaperPosition', [0 0 8 3]);
-set(fig1, 'PaperSize', [8 3]);
-set(fig1, 'Color', 'w');
-set(fig1, 'InvertHardcopy', 'off');
-saveas(fig1, fullfile(outDir, 'FigureX_PerceptualDataValidationLMS'), 'pdf');
+% % Save figure (optional)
+% set(fig1, 'PaperPosition', [0 0 8 3]);
+% set(fig1, 'PaperSize', [8 3]);
+% set(fig1, 'Color', 'w');
+% set(fig1, 'InvertHardcopy', 'off');
+% saveas(fig1, fullfile(outDir, 'FigureX_PerceptualDataValidationLMS'), 'pdf');
 close(fig1);
 %%
 fig2 = figure;
@@ -346,12 +346,12 @@ plot(mean(postRecepContrastsFixedMel(1, :)), mean(postRecepContrastsFixedMel(3, 
 [X, Y] = get_error_ellipse([postRecepContrastsFixedMel(1, :) ; postRecepContrastsFixedMel(3, :)]', 0.95); hold on;
 plot(X, Y, '-k');
 
-% Save figure
-set(fig2, 'PaperPosition', [0 0 8 3]);
-set(fig2, 'PaperSize', [8 3]);
-set(fig2, 'Color', 'w');
-set(fig2, 'InvertHardcopy', 'off');
-saveas(fig2, fullfile(outDir, 'FigureX_PerceptualDataValidationMel'), 'pdf');
+% % Save figure (optional)
+% set(fig2, 'PaperPosition', [0 0 8 3]);
+% set(fig2, 'PaperSize', [8 3]);
+% set(fig2, 'Color', 'w');
+% set(fig2, 'InvertHardcopy', 'off');
+% saveas(fig2, fullfile(outDir, 'FigureX_PerceptualDataValidationMel'), 'pdf');
 close(fig2);
 
 warning('on', 'MATLAB:load:cannotInstantiateLoadedVariable');
@@ -429,7 +429,7 @@ set(fig1, 'PaperPosition', [0 0 8 3]);
 set(fig1, 'PaperSize', [8 3]);
 set(fig1, 'Color', 'w');
 set(fig1, 'InvertHardcopy', 'off');
-saveas(fig1, fullfile(outDir, 'FigureX_PerceptualDataPhysiologicalSplatterLMS'), 'pdf');
+saveas(fig1, fullfile(outDir, 'FigureS11a'), 'pdf'); % PerceptualDataPhysiologicalSplatterLMS
 close(fig1);
 
 % Plot the biological splatter
@@ -467,7 +467,7 @@ set(fig2, 'PaperPosition', [0 0 8 3]);
 set(fig2, 'PaperSize', [8 3]);
 set(fig2, 'Color', 'w');
 set(fig2, 'InvertHardcopy', 'off');
-saveas(fig2, fullfile(outDir, 'FigureX_PerceptualDataPhysiologicalSplatterMel'), 'pdf');
+saveas(fig2, fullfile(outDir, 'FigureS11b'), 'pdf'); %PerceptualDataPhysiologicalSplatterMel
 close(fig2);
 
 cd(currDir);
