@@ -5,7 +5,7 @@ fprintf('> Running %s\n', mfilename);
 currDir = pwd;
 outDir = fullfile(analysisDir, 'figures');
 outTableDir = fullfile(analysisDir, 'tables', 'perceptualdata');
-outFileSplatter = fullfile(analysisDir, 'tables', 'TableX_SplatterPerceptualData.csv');
+outFileSplatter = fullfile(analysisDir, 'tables', 'Table_ContrastPerceptualData.csv');
 if ~isdir(outTableDir)
     mkdir(outTableDir);
 end
