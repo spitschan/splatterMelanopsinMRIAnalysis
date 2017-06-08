@@ -24,9 +24,9 @@ T_xyz = SplineCmf(S_xyz1931,683*T_xyz1931,WlsToS(wls));
 currDir = pwd;
 LOG_PLOT = false;
 if LOG_PLOT
-    outFig1 = fullfile(outDir, 'FigureX_Spectra_log10.pdf');
+    outFig1 = fullfile(outDir, 'Figure1d_FigureS1a_log10.pdf');
 else
-    outFig1 = fullfile(outDir, 'FigureX_Spectra.pdf');
+    outFig1 = fullfile(outDir, 'Figure1d_FigureS1a.pdf');
 end
 for d = 1:length(theDataPaths)
     subplot(3, 2, d);
@@ -120,7 +120,7 @@ saveas(theFig, outFig1, 'pdf');
 close(theFig);
 
 %% Plot the chromaticity
-outFig2 = fullfile(outDir, 'FigureX_Chromaticity.pdf');
+outFig2 = fullfile(outDir, 'Figure1e_FigureS1b.pdf');
 theRGB = jet(length(chromaticity));
 theFig = figure;
 c = 1;
@@ -143,34 +143,34 @@ set(theFig, 'InvertHardcopy', 'off');
 saveas(theFig, outFig2, 'pdf');
 xlabel('x'); ylabel('y');
 
-outFig2 = fullfile(outDir, 'FigureX_ChromaticityCloseup.pdf');
-theFig = figure;
-c = 1;
-for dd = [2 4 5]
-    plot(chromaticity{dd}(:, 1), chromaticity{dd}(:, 2), '-k'); hold on;
-    for ii = 1:length(chromaticity{dd})
-        h(c) = plot(chromaticity{dd}(ii, 1), chromaticity{dd}(ii, 2), 'Marker', 's', 'Color', 'k', 'MarkerFaceColor', theRGB(dd, :)); hold on;
-    end
-    plot(chromaticity{dd}(1, 1), chromaticity{dd}(1, 2), 'sk', 'MarkerFaceColor', 'k');
-    c = c+1;
-end
-
-% Plot horseshoe
-load T_xyz1931
-out = SplineCmf(S_xyz1931, T_xyz1931, S_xyz1931);
-x = out(1, :)./sum(out);
-y = out(2, :)./sum(out);
-plot([x(1:65) x(1)], [y(1:65) y(1)], '-k');
-xlim([0.4 0.7]); ylim([0.25 0.55]);
-legend(h, theStimuli{[2 4 5]});
-set(theFig, 'PaperPosition', [0 0 5 5]);
-set(theFig, 'PaperSize', [5 5]);
-set(theFig, 'Color', 'w');
-set(theFig, 'InvertHardcopy', 'off');
-saveas(theFig, outFig2, 'pdf');
-xlabel('x'); ylabel('y');
-
-%close(theFig);
-pbaspect([1 1 1]); box off; set(gca, 'TickDir', 'out');
+% outFig2 = fullfile(outDir, 'FigureX_ChromaticityCloseup.pdf');
+% theFig = figure;
+% c = 1;
+% for dd = [2 4 5]
+%     plot(chromaticity{dd}(:, 1), chromaticity{dd}(:, 2), '-k'); hold on;
+%     for ii = 1:length(chromaticity{dd})
+%         h(c) = plot(chromaticity{dd}(ii, 1), chromaticity{dd}(ii, 2), 'Marker', 's', 'Color', 'k', 'MarkerFaceColor', theRGB(dd, :)); hold on;
+%     end
+%     plot(chromaticity{dd}(1, 1), chromaticity{dd}(1, 2), 'sk', 'MarkerFaceColor', 'k');
+%     c = c+1;
+% end
+% 
+% % Plot horseshoe
+% load T_xyz1931
+% out = SplineCmf(S_xyz1931, T_xyz1931, S_xyz1931);
+% x = out(1, :)./sum(out);
+% y = out(2, :)./sum(out);
+% plot([x(1:65) x(1)], [y(1:65) y(1)], '-k');
+% xlim([0.4 0.7]); ylim([0.25 0.55]);
+% legend(h, theStimuli{[2 4 5]});
+% set(theFig, 'PaperPosition', [0 0 5 5]);
+% set(theFig, 'PaperSize', [5 5]);
+% set(theFig, 'Color', 'w');
+% set(theFig, 'InvertHardcopy', 'off');
+% saveas(theFig, outFig2, 'pdf');
+% xlabel('x'); ylabel('y');
+% 
+% %close(theFig);
+% pbaspect([1 1 1]); box off; set(gca, 'TickDir', 'out');
 
 cd(currDir);
