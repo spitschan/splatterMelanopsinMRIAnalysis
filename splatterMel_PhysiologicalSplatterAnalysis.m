@@ -60,14 +60,14 @@ for dd = 1: length(datasets)
         % toggle output files name
         switch whichDataSet
             case 'MelCRF'
-                outFile1 = fullfile(outDir, ['FigureX_PhysiologicalSplatter_' whichDataSet '.pdf']);
-                outFile2 = fullfile(outDir, ['FigureX_PhysiologicalSplatterMarginals_' whichDataSet '.pdf']);
+                outFile1 = fullfile(outDir, ['FigureX_PhysiologicalSplatter_' whichDataSet '.pdf']); %%%CHANGENAME
+                outFile2 = fullfile(outDir, ['FigureX_PhysiologicalSplatterMarginals_' whichDataSet '.pdf']); %%%CHANGENAME
             case 'Mel400Only'
-                outFile1 = fullfile(outDir, ['FigureX_PhysiologicalSplatter_' whichDataSet '.pdf']);
-                outFile2 = fullfile(outDir, ['FigureX_PhysiologicalSplatterMarginals_' whichDataSet '.pdf']);
+                outFile1 = fullfile(outDir, ['FigureX_PhysiologicalSplatter_' whichDataSet '.pdf']); %%%CHANGENAME
+                outFile2 = fullfile(outDir, ['FigureX_PhysiologicalSplatterMarginals_' whichDataSet '.pdf']); %%%CHANGENAME
             case 'LMS400Only'
-                outFile1 = fullfile(outDir, ['FigureX_PhysiologicalSplatter_' whichDataSet '.pdf']);
-                outFile2 = fullfile(outDir, ['FigureX_PhysiologicalSplatterMarginals_' whichDataSet '.pdf']);
+                outFile1 = fullfile(outDir, 'FigureS5_notshown01.pdf');
+                outFile2 = fullfile(outDir, 'FigureS5_notshown02.pdf');
         end
         dataPath = theDataPaths{d};
         
@@ -321,5 +321,4 @@ for dd = 1: length(datasets)
     close(fig2);
     
     cd(currDir);
-    
 end
