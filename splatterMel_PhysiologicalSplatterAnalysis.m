@@ -60,11 +60,11 @@ for dd = 1: length(datasets)
         % toggle output files name
         switch whichDataSet
             case 'MelCRF'
-                outFile1 = fullfile(outDir, ['FigureX_PhysiologicalSplatter_' whichDataSet '.pdf']); %%%CHANGENAME
-                outFile2 = fullfile(outDir, ['FigureX_PhysiologicalSplatterMarginals_' whichDataSet '.pdf']); %%%CHANGENAME
+                outFile1 = fullfile(outDir, 'Figure_S5a01.pdf');
+                outFile2 = fullfile(outDir, 'Figure_S5a02.pdf');
             case 'Mel400Only'
-                outFile1 = fullfile(outDir, ['FigureX_PhysiologicalSplatter_' whichDataSet '.pdf']); %%%CHANGENAME
-                outFile2 = fullfile(outDir, ['FigureX_PhysiologicalSplatterMarginals_' whichDataSet '.pdf']); %%%CHANGENAME
+                outFile1 = fullfile(outDir, 'Figure_S5b01.pdf'); %%%CHANGENAME
+                outFile2 = fullfile(outDir, 'Figure_S5b02.pdf'); %%%CHANGENAME
             case 'LMS400Only'
                 outFile1 = fullfile(outDir, 'FigureS5_notshown01.pdf');
                 outFile2 = fullfile(outDir, 'FigureS5_notshown02.pdf');
